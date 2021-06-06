@@ -35,7 +35,7 @@ Overview of node-oracledb functional tests
         1.10.3 uses username alias to login with SYSDBA privilege
 
   2. pool.js
-    2.1 default settting
+    2.1 default setting
         2.1.1 testing default values of pool properties
     2.2 poolMin
         2.2.1 poolMin cannot be a negative number
@@ -68,6 +68,7 @@ Overview of node-oracledb functional tests
         2.8.3 does not generate NJS-040 if request is queued for less time than queueTimeout
         2.8.4 generates NJS-076 if request exceeds queueMax
         2.8.5 generates NJS-076 if request exceeds queueMax 0
+        2.8.6 request queue never terminate for queueTimeout set to 0
     2.9 _enableStats & _logStats functionality
         2.9.1 does not work after the pool has been terminated
     2.10 Close method
@@ -466,7 +467,7 @@ Overview of node-oracledb functional tests
         19.2.6 fetchAsString property and OBJECT outFormat
         19.2.7 fetchAsString property, resultSet
         19.2.8 fetchAsString property, resultSet and OBJECT outFormat
-    19.3 testing maxRows setttings and queryStream() to fetch as string
+    19.3 testing maxRows settings and queryStream() to fetch as string
         19.3.1 works well when setting oracledb.maxRows > actual number of rows
         19.3.2 maxRows = actual num of rows
         19.3.3 works when oracledb.maxRows < actual number of rows
@@ -621,7 +622,7 @@ Overview of node-oracledb functional tests
         34.1.3 works well with REF Cursor
         34.1.4 columns fetched from REF CURSORS can be mapped by fetchInfo settings
         34.1.5 columns fetched from REF CURSORS can be mapped by oracledb.fetchAsString
-    34.2 sotres null value correctly
+    34.2 stores null value correctly
         34.2.1 testing Null, Empty string and Undefined
     34.3 testing database TIMESTAMP(p)
         34.3.1 SELECT query - original data
@@ -843,8 +844,10 @@ Overview of node-oracledb functional tests
     55.5 the content of resultSet should be consistent
         55.5.1 (1) get RS (2) modify data in that table and commit (3) check RS
     55.6 access resultSet simultaneously
-        55.6.1 concurrent operations on resultSet are not allowed
+        55.6.1 concurrent operations on resultSet are not allowed (using getRows())
         55.6.2 concurrent operation on REF Cursor are not allowed
+        55.6.3 concurrent operations on resultSet are not allowed (using getRow())
+        55.6.4 concurrently closing resultSet not allowed
     55.7 getting multiple resultSets
         55.7.1 can access multiple resultSet on one connection
         55.7.2 can access multiple REF Cursor
@@ -3755,23 +3758,53 @@ oracledb.OUT_FORMAT_OBJECT and resultSet =  true
         146.3.3 update with urowid length > 2000
 
 147. prefetchRows.js
-    147.1 set oracledb.prefetchRows to be 0
-    147.2 Negative - negative value
-    147.3 Negative - NaN
-    147.4 Negative - undefined
-    147.5 Negative - null
-    147.6 Negative - random string
-    147.7 Negative - Boolean
-    147.8 execute() option, value of 0
-    147.9 Negative - negative value
-    147.10 Negative - NaN
-    147.11 execute() option, undefined, get overrided by global attribute
-    147.12 Negative - null
-    147.13 Negative - random string
-    147.14 Negative - Boolean
-    147.15 Query round-trips with no prefetch
-    147.16 Query round-trips with prefetch equal to row count
-    147.17 Query round-trips with prefetch larger than row count
+    147.1 prefetchRows with simple execution
+        147.1.1 set oracledb.prefetchRows to be 0
+        147.1.2 Negative - negative value
+        147.1.3 Negative - NaN
+        147.1.4 Negative - undefined
+        147.1.5 Negative - null
+        147.1.6 Negative - random string
+        147.1.7 Negative - Boolean
+        147.1.8 execute() option, value of 0
+        147.1.9 Negative - negative value
+        147.1.10 Negative - NaN
+        147.1.11 execute() option, undefined, get overrided by global attribute
+        147.1.12 Negative - null
+        147.1.13 Negative - random string
+        147.1.14 Negative - Boolean
+        147.1.15 Query round-trips with no prefetch
+        147.1.16 Query round-trips with prefetch equal to row count
+        147.1.17 Query round-trips with prefetch > row count and fetchArraySize > row count
+        147.1.18 Query round-trips with prefetch > row count and fetchArraySize < row count
+        147.1.19 Query round-trips with prefetch < row count and fetchArraySize > total rows
+        147.1.20 Query round-trips with prefetch < row count and fetchArraySize = total rows
+        147.1.21 Query round-trips with prefetch < row count fetchArraySize < total rows
+    147.2 prefetchRows with resultSet
+        147.2.1 set oracledb.prefetchRows to be 0
+        147.2.2 execute() option, value of 0
+        147.2.3 Negative - negative value
+        147.2.4 Negative - NaN
+        147.2.5 execute() option, undefined, get overrided by global attribute
+        147.2.6 Negative - null
+        147.2.7 Negative - random string
+        147.2.8 Negative - Boolean
+        147.2.9 Query round-trips with no prefetch
+        147.2.10 Query round-trips with prefetch equal to row count
+        147.2.11 Query round-trips with prefetch larger than row count
+        147.2.12 Query round-trips with prefetch < row count, fetchArraySize < row count and getRows()
+        147.2.13 Query round-trips with prefetch < row count, fetchArraySize > row count and getRows(n < row count)
+        147.2.14 Query round-trips with prefetch < row count, fetchArraySize > row count and getRows(n > row count)
+        147.2.15 Query round-trips with prefetch < row count, fetchArraySize > row count and getRows()
+    147.3 prefetchRows with queryStream
+        147.3.1 set oracledb.prefetchRows to be 0
+        147.3.2 execute() option, value of 0
+        147.3.3 execute() option, undefined, get overrided by global attribute
+        147.3.4 Query round-trips with no prefetch
+        147.3.5 Query round-trips with prefetch equal to row count
+        147.3.6 Query round-trips with prefetch larger than row count
+        147.3.7 Query round-trips with prefetch < row count and fetchArraySize < row count
+        147.3.8 Query round-trips with prefetch < row count and fetchArraySize > row count
 
 148. fetchArraySize1.js
     148.1 oracledb.fetchArraySize
@@ -4268,6 +4301,9 @@ oracledb.OUT_FORMAT_OBJECT and resultSet =  true
     174.10 Negative - keys() no parameter
     174.11 Negative - keys(null)
     174.12 try to query documents with nonexistent keys
+    174.13 hint(), basic case
+    174.14 Negative - no parameter
+    174.15 Negative - invalid parameter type
 
   175. soda7.js
     175.1 count(), basic case
@@ -4308,8 +4344,10 @@ oracledb.OUT_FORMAT_OBJECT and resultSet =  true
     178.2 insertMany() with newSodaDocumentContentArray
     178.3 insertManyAndGet() with newDocumentArray
     178.4 insertManyAndGet() with newDocumentContentArray
-    174.5 Negative - insertMany() with an empty array
-    174.6 Negative - insertManyAndGet() with an empty array
+    178.5 Negative - insertMany() with an empty array
+    178.6 Negative - insertManyAndGet() with an empty array
+    178.7 insertManyAndGet() with hint option
+    178.8 Negative - insertManyAndGet() with invalid options parameter
 
 179. soda11.js
    179.1 create collection with metadata
@@ -4347,8 +4385,8 @@ oracledb.OUT_FORMAT_OBJECT and resultSet =  true
 
 182. deferLibInit.js
     182.1 defers initializatiion of ODPI-C
-    182.2 Negative: throws error when asking for ODPI-C attributes
-    182.3 Negative: call oracledb method
+    182.2 Negative: throws error when asking for ODPI-C attributes without LD_LIBRARY_PATH and ORACLE_HOME set
+    182.3 Negative: throws error when calling oracledb method without LD_LIBRARY_PATH and ORACLE_HOME set
 
 184. sessionTag.js
     184.1 Remote PL/SQL Callback
@@ -4926,7 +4964,7 @@ oracledb.OUT_FORMAT_OBJECT and resultSet =  true
         248.1.1 test with username size 30
         248.1.2 test with username size 100
         248.1.3 test with username size 128
-        248.1.4 test with username size 129
+        248.1.4 test with username size 1000
         248.1.5 negative test: username = null
         248.1.6 negative test: username = "null"
         248.1.7 negative test: username = undefined
@@ -4938,7 +4976,7 @@ oracledb.OUT_FORMAT_OBJECT and resultSet =  true
         248.2.1 test with user size 30
         248.2.2 test with user size 100
         248.2.3 test with user size 128
-        248.2.4 test with username size 129
+        248.2.4 test with username size 1000
         248.2.5 negative test: user = null
         248.2.6 negative test: username = "null"
         248.2.7 negative test: username = undefined
@@ -4994,3 +5032,176 @@ oracledb.OUT_FORMAT_OBJECT and resultSet =  true
     250.4 Nested Cursor + getRow() + getRows(0) rows ARRAY outformat
     250.5 Nested Cursor + getRows(n) + getRows(0) with fetchArraySize < remaining rows inside nested cursor
     250.6 Nested Cursor + getRows(n) + getRow() + getRows() with fetchArraySize = 1
+
+
+251. fetchNClobAsString.js
+    251.1 NCLOB type in fetchAsString
+    251.2 NCLOB type in fetchAsString and fetch NCLOB data
+    251.3 CLOB type in fetchAsString and fetch NCLOB data
+    251.4 NCLOB type in fetchAsString and fetch CLOB data
+    251.5 CLOB type in fetchAsString and fetch CLOB data
+    251.6 CLOB & NCLOB type in fetchAs String and fetch CLOB & NCLOB
+
+252. sodaMetaDataCache.js
+    252.1 sodaMetaDataCache set to TRUE
+    252.2 sodaMetaDataCache set to FALSE
+    252.3 sodaMetaDataCache not specified
+    252.4 sodaMetaDataCache from closed pool
+
+253. jsonBind1.js
+    253.1 Map javascript object directly into JSON
+        253.1.1 Number, String type
+        253.1.2 Boolean and null value
+        253.1.3 Array type
+        253.1.4 Object type
+        253.1.5 Using JSON_VALUE to extract a value from a JSON column
+        253.1.6 Using dot-notation to extract a value from a JSON column
+        253.1.7 Using JSON_OBJECT to extract relational data as JSON
+        253.1.8 Number, String type with BIND_INOUT
+        253.1.9 Boolean and null value with BIND_INOUT
+        253.1.10 Array type with BIND_INOUT
+        253.1.11 Object type with BIND_INOUT
+    253.2 Map javascript object using SQL syntax into JSON
+        253.2.1 Number type
+        253.2.2 String type
+        253.2.3 TIMESTAMP type
+        253.2.4 RAW type
+        253.2.5 Array type
+        253.2.6 Object type
+        253.2.7 CLOB type
+        253.2.8 BLOB type
+        253.2.9 DATE type
+        253.2.10 INTERVAL YEAR TO MONTH type
+        253.2.11 INTERVAL DAY TO SECOND type
+        253.2.12 BINARY_DOUBLE type
+        253.2.13 BINARY_FLOAT type
+        253.2.14 NULL value
+
+254. jsonBind2.js
+    254.1 Map javascript object into BLOB
+        254.1.1 Number, String type
+        254.1.2 Boolean and null value
+        254.1.3 Array type
+        254.1.4 Object type
+        254.1.5 Using JSON_VALUE to extract a value from a BLOB column
+        254.1.6 Using dot-notation to extract a value from a BLOB column
+    254.2 Map javascript object into VARCHAR2
+        254.2.1 Number, String type
+        254.2.2 Boolean and null value
+        254.2.3 Array type
+        254.2.4 Object type
+        254.2.5 Using JSON_VALUE to extract a value from a VARCHAR2 column
+        254.2.6 Using dot-notation to extract a value from a VARCHAR2 column
+    254.3 Map javascript object into CLOB
+        254.3.1 Number, String type (41ms)
+        254.3.2 Boolean and null value
+        254.3.3 Array type
+        254.3.4 Object type
+        254.3.5 Using JSON_VALUE to extract a value from a CLOB column
+        254.3.6 Using dot-notation to extract a value from a CLOB column
+
+255. poolReconfigure.js
+    255.1 poolReconfigure - poolMin/poolMax/poolIncrement properties
+        255.1.1 Change poolMin - increase
+        255.1.2 Change poolMin - decrease
+        255.1.3 Change poolMax - increase
+        255.1.4 Change poolMax - decrease
+        255.1.5 Change poolIncrement - increase
+        255.1.6 Change poolIncrement - decrease
+        255.1.7 increase poolMin & poolMax
+        255.1.8 increase poolMin & poolIncrement
+        255.1.9 increase poolMax & poolIncrement
+        255.1.10 increase poolMin/poolMax/poolIncrement
+        255.1.11 Change enableStatistics to true
+        255.1.12 Change enableStatistics to false
+        255.1.13 Decreasing poolMax when all connection are in use
+        255.1.14 reconfigure poolMin/poolMax/poolIncrement multiple times
+        255.1.15 reconfigure poolMin/poolMax/poolIncrement multiple times
+        255.1.16 Connection queuing after decreasing poolMax
+        255.1.17 Connection queuing after increasing poolMax
+    255.2 poolReconfigure - other properties
+        255.2.1 change poolPingInterval
+        255.2.2 change poolTimeout
+        255.2.3 change maxPerShard
+        255.2.4 change stmtCacheSize
+        255.2.5 change resetStatistics with enableStatistics
+        255.2.6 change resetStatistics
+        255.2.7 getStatistics
+    255.3 poolReconfigure JS layer properties
+        255.3.1 change queueMax
+        255.3.2 change queueTimeout
+        255.3.3 change maxSessionsPerShard
+        255.3.4 sodaMetaDataCache set to true
+        255.3.5 sodaMetaDataCache set to false
+    255.4 Pool properties NOT dynamically configurable, they will be ignored
+        255.4.1 connectionsInUse
+        255.4.2 connectionsOpen
+        255.4.3 connectString
+        255.4.4 connectionString
+        255.4.5 edition
+        255.4.6 events
+        255.4.7 homogeneous
+        255.4.8 externalAuth
+        255.4.9 password
+        255.4.10 poolAlias
+        255.4.11 status
+        255.4.12 username
+        255.4.13 user
+        255.4.14 _enableStats
+    255.5 Negative cases
+        255.5.1 passing empty config to pool.reconfigure
+        255.5.2 passing invalid poolMin to pool.reconfigure
+        255.5.3 passing invalid poolMax to pool.reconfigure
+        255.5.4 passing invalid poolIncrement to pool.reconfigure
+        255.5.5 passing invalid enableStatistics to pool.reconfigure
+        255.5.6 passing invalid poolPingInterval to pool.reconfigure
+        255.5.7 passing invalid poolTimeout to pool.reconfigure
+        255.5.8 passing invalid poolMaxPerShard to pool.reconfigure
+        255.5.9 passing invalid queueMax to pool.reconfigure
+        255.5.10 passing invalid queueTimeout to pool.reconfigure
+        255.5.11 passing invalid stmtCacheSize to pool.reconfigure
+        255.5.12 calling pool.reconfigure multiple times with empty config
+        255.5.13 calling pool.reconfigure multiple times
+        255.5.14 reconfigure closed pool
+        255.5.15 get statistics of a closed pool
+    255.6 Pool statistics
+        255.6.1 get pool statistics by setting _enableStats
+        255.6.2 get pool statistics by setting _enableStats
+        255.6.3 set enableStatistics to true, _enableStats will be ignored
+        255.6.4 set enableStatistics to false, _enableStats will be used
+        255.6.5 set multiple enableStatistics
+        255.6.6 set multiple _enableStats
+        255.6.7 get pool statistics by setting enableStatistics
+        255.6.8 get pool statistics by setting enableStatistics
+        255.6.9 get pool statistics by setting enableStatistics and _enableStats
+        255.6.10 logStatistics without enableStatistics
+
+256. executeQueue.js
+    256.1 Connection.execute()
+        256.1.1 errorOnConcurrentExecute set to false
+        256.1.2 errorOnConcurrentExecute set to true
+        256.1.3 break() not constrained by queue
+    256.2 SodaDatabase.createCollection()
+        256.2.1 errorOnConcurrentExecute set to false
+        256.2.2 errorOnConcurrentExecute set to true
+    256.3 SodaCollection.insertOne()
+        256.3.1 errorOnConcurrentExecute set to false
+        256.3.2 errorOnConcurrentExecute set to true
+    256.4 SodaOperation.count()
+        256.4.1 errorOnConcurrentExecute set to false
+        256.4.2 errorOnConcurrentExecute set to true
+    256.5 SodaDocCursor.getNext()
+        256.5.1 errorOnConcurrentExecute set to false
+        256.5.2 errorOnConcurrentExecute set to true
+    256.6 Execute queue length
+        256.6.1 errorOnConcurrentExecute set to false
+        256.6.2 errorOnConcurrentExecute set to true
+    256.7 Lob.getData()
+        256.7.1 errorOnConcurrentExecute set to false
+        256.7.2 errorOnConcurrentExecute set to true
+
+257. sodahint.js
+    257.1 insertOneAndGet() with hint option
+    257.2 Negative - insertOneAndGet() with invalid options parameter
+    257.3 saveAndGet() with hint option
+    257.4 Negative - saveAndGet() with invalid options parameter

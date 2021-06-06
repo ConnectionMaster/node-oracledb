@@ -42,7 +42,7 @@
 #define NJS_NODE_ORACLEDB_MAJOR       5
 #define NJS_NODE_ORACLEDB_MINOR       2
 #define NJS_NODE_ORACLEDB_PATCH       0
-#define NJS_NODE_ORACLEDB_SUFFIX      "-dev"
+#define NJS_NODE_ORACLEDB_SUFFIX      ""
 
 // define stringified version and driver name
 #define NJS_STR_HELPER(x)       #x
@@ -84,12 +84,12 @@
         var = NULL; \
     }
 
-// define macro for checking the result of an N-API call
+// define macro for checking the result of an Node-API call
 #define NJS_CHECK_NAPI(env, status) \
     if ((status) != napi_ok) \
         return njsUtils_genericThrowError(env);
 
-// define macros for defining N-API functions; many are identical but different
+// define macros for defining Node-API functions; many are identical but different
 // names are used to make it easier to read
 #define NJS_NAPI_GETTER(name) \
     napi_value name(napi_env, napi_callback_info)
@@ -203,6 +203,9 @@ typedef enum {
     errUnsupportedDataTypeInJson,
     errConvertToJsonValue,
     errDblUsername,
+    errConcurrentOps,
+    errPoolReconfiguring,
+    errPoolStatisticsDisabled,
 
     // New ones should be added here
 
@@ -213,6 +216,7 @@ typedef enum {
 #define NJS_POOL_STATUS_OPEN            6000
 #define NJS_POOL_STATUS_DRAINING        6001
 #define NJS_POOL_STATUS_CLOSED          6002
+#define NJS_POOL_STATUS_RECONFIGURING   6003
 
 // values used for "outFormat"
 #define NJS_ROWS_ARRAY                  4001
@@ -378,6 +382,8 @@ struct njsBaton {
     size_t filterLength;
     char *version;
     size_t versionLength;
+    char *hint;
+    size_t hintLength;
     char *pfile;                             // for DB startup
     size_t pfileLength;
 
@@ -490,6 +496,7 @@ struct njsBaton {
     bool force;
     bool clientInitiated;
     bool dbObjectAsPojo;
+    bool sodaMetadataCache;
 
     // LOB buffer (requires free only if string was used)
     uint64_t bufferSize;
@@ -505,9 +512,9 @@ struct njsBaton {
     uint8_t  numSuperShardingKeyColumns;
 
     // references that are held (requires free)
-    napi_ref jsBuffer;
-    napi_ref jsCallingObj;
-    napi_ref jsSubscription;
+    napi_ref jsBufferRef;
+    napi_ref jsCallingObjRef;
+    napi_ref jsSubscriptionRef;
 
     // values required to check if a value is a date; this is only used when
     // binding data in connection.execute() and connection.executeMany() and
@@ -522,6 +529,9 @@ struct njsBaton {
     napi_value jsLobConstructor;
     napi_value jsResultSetConstructor;
     napi_value jsBaseDbObjectConstructor;
+
+    // calling object value (used for setting a reference on created objects)
+    napi_value jsCallingObj;
 
     // asynchronous work parameters
     napi_async_work asyncWork;
@@ -663,6 +673,7 @@ struct njsPool {
     uint32_t poolTimeout;
     uint32_t stmtCacheSize;
     int32_t poolPingInterval;
+    bool  sodaMetadataCache;
 };
 
 // data for class ResultSet exposed to JS.
@@ -862,9 +873,9 @@ napi_value njsBaton_queueWork(njsBaton *baton, napi_env env,
         const char *methodName, bool (*workCallback)(njsBaton*),
         bool (*afterWorkCallback)(njsBaton*, napi_env, napi_value*));
 void njsBaton_reportError(njsBaton *baton, napi_env env);
-bool njsBaton_setConstructors(njsBaton *baton, napi_env env);
 bool njsBaton_setError(njsBaton *baton, int errNum, ...);
 bool njsBaton_setErrorDPI(njsBaton *baton);
+bool njsBaton_setJsValues(njsBaton *baton, napi_env env);
 
 
 //-----------------------------------------------------------------------------
@@ -916,7 +927,7 @@ bool njsConnection_newFromBaton(njsBaton *baton, napi_env env,
 //-----------------------------------------------------------------------------
 bool njsLob_populateBuffer(njsBaton *baton, njsLobBuffer *buffer);
 bool njsLob_new(njsOracleDb *oracleDb, njsLobBuffer *buffer, napi_env env,
-        napi_value *lobObj);
+        napi_value parentObj, napi_value *lobObj);
 
 //-----------------------------------------------------------------------------
 // definition of functions for njsPool class
@@ -956,8 +967,8 @@ bool njsSodaDocument_createFromHandle(napi_env env, dpiSodaDoc *handle,
 //-----------------------------------------------------------------------------
 // definition of functions for njsSodaDatabase class
 //-----------------------------------------------------------------------------
-bool njsSodaDatabase_createFromHandle(napi_env env, njsConnection *conn,
-        dpiSodaDb *handle, napi_value *dbObj);
+bool njsSodaDatabase_createFromHandle(napi_env env, napi_value connObj,
+        njsConnection *conn, dpiSodaDb *handle, napi_value *dbObj);
 
 
 //-----------------------------------------------------------------------------

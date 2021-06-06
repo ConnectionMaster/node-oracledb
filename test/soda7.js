@@ -45,7 +45,6 @@ describe('175. soda7.js', () => {
     }
 
     await sodaUtil.cleanup();
-    await sodaUtil.grantPrivilege();
   });
 
   it('175.1 count(), basic case', async () => {
@@ -53,7 +52,7 @@ describe('175. soda7.js', () => {
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_175_1");
 
       await Promise.all(
@@ -68,7 +67,7 @@ describe('175. soda7.js', () => {
 
       await conn.commit();
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       if (collection) {
@@ -78,7 +77,7 @@ describe('175. soda7.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
@@ -90,7 +89,7 @@ describe('175. soda7.js', () => {
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_175_2");
 
       await Promise.all(
@@ -107,7 +106,7 @@ describe('175. soda7.js', () => {
       );
       // ORA-40748: SKIP and LIMIT attributes cannot be used for count operation.
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -118,7 +117,7 @@ describe('175. soda7.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
@@ -130,7 +129,7 @@ describe('175. soda7.js', () => {
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_175_3");
 
       await Promise.all(
@@ -147,7 +146,7 @@ describe('175. soda7.js', () => {
       );
       // ORA-40748: SKIP and LIMIT attributes cannot be used for count operation.
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -158,7 +157,7 @@ describe('175. soda7.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
@@ -170,7 +169,7 @@ describe('175. soda7.js', () => {
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_175_4");
 
       let myKeys = [];
@@ -187,7 +186,7 @@ describe('175. soda7.js', () => {
 
       await conn.commit();
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -199,7 +198,7 @@ describe('175. soda7.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
@@ -211,7 +210,7 @@ describe('175. soda7.js', () => {
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_175_5");
 
       await Promise.all(
@@ -228,10 +227,10 @@ describe('175. soda7.js', () => {
       let myDocument;
       for (let i = 0; hasNext; i++) {
         myDocument = await docCursor.getNext();
-        if(!myDocument) {
+        if (!myDocument) {
           hasNext = false;
         } else {
-          myContents[i] = await myDocument.getContent();
+          myContents[i] = myDocument.getContent();
           (myContents[i]).should.be.oneOf(t_contents);
         }
       }
@@ -240,7 +239,7 @@ describe('175. soda7.js', () => {
 
       await docCursor.close();
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -252,7 +251,7 @@ describe('175. soda7.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
@@ -264,7 +263,7 @@ describe('175. soda7.js', () => {
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_175_6");
 
       await Promise.all(
@@ -282,18 +281,18 @@ describe('175. soda7.js', () => {
       let myDocument;
       for (let i = 0; hasNext; i++) {
         myDocument = await docCursor.getNext();
-        if(!myDocument) {
+        if (!myDocument) {
           hasNext = false;
         } else {
-          myContents[i] = await myDocument.getContent();
+          myContents[i] = myDocument.getContent();
           (myContents[i]).should.be.oneOf(t_contents);
         }
       }
 
-      should.strictEqual( myContents.length, (t_contents.length - numberToSkip) );
+      should.strictEqual(myContents.length, (t_contents.length - numberToSkip));
       await docCursor.close();
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -305,7 +304,7 @@ describe('175. soda7.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
@@ -317,7 +316,7 @@ describe('175. soda7.js', () => {
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_175_7");
 
       await Promise.all(
@@ -334,7 +333,7 @@ describe('175. soda7.js', () => {
       should.strictEqual(myDocument, undefined);
       await docCursor.close();
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -346,7 +345,7 @@ describe('175. soda7.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
@@ -358,7 +357,7 @@ describe('175. soda7.js', () => {
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_175_8");
 
       await Promise.all(
@@ -375,10 +374,10 @@ describe('175. soda7.js', () => {
       let myDocument;
       for (let i = 0; hasNext; i++) {
         myDocument = await docCursor.getNext();
-        if(!myDocument) {
+        if (!myDocument) {
           hasNext = false;
         } else {
-          myContents[i] = await myDocument.getContent();
+          myContents[i] = myDocument.getContent();
           (myContents[i]).should.be.oneOf(t_contents);
         }
       }
@@ -391,7 +390,7 @@ describe('175. soda7.js', () => {
         /NJS-066: invalid SODA document cursor/
       );
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -403,7 +402,7 @@ describe('175. soda7.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
@@ -415,7 +414,7 @@ describe('175. soda7.js', () => {
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_175_9");
 
       await Promise.all(
@@ -429,12 +428,12 @@ describe('175. soda7.js', () => {
 
       // Get contents
       let myContents = [];
-      for (let i = 0; i < documents.length; i++ ) {
-        myContents[i] = await documents[i].getContent();
+      for (let i = 0; i < documents.length; i++) {
+        myContents[i] = documents[i].getContent();
         (myContents[i]).should.be.oneOf(t_contents);
       }
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -446,7 +445,7 @@ describe('175. soda7.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
@@ -458,14 +457,14 @@ describe('175. soda7.js', () => {
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_175_10");
 
       // Fetch back
       let documents = await collection.find().getDocuments();
       should.deepEqual(documents, []);
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -477,7 +476,7 @@ describe('175. soda7.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
@@ -489,7 +488,7 @@ describe('175. soda7.js', () => {
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_175_11");
 
       let myKeys = [];
@@ -501,10 +500,10 @@ describe('175. soda7.js', () => {
 
       // Fetch back
       let document = await collection.find().key(myKeys[1]).getOne();
-      let content = await document.getContent();
+      let content = document.getContent();
       content.should.be.oneOf(t_contents);
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -516,7 +515,7 @@ describe('175. soda7.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
@@ -528,7 +527,7 @@ describe('175. soda7.js', () => {
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_175_12");
 
       await Promise.all(
@@ -539,10 +538,10 @@ describe('175. soda7.js', () => {
 
       // Fetch back
       let document = await collection.find().getOne();
-      let content = await document.getContent();
+      let content = document.getContent();
       content.should.be.oneOf(t_contents);
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -554,7 +553,7 @@ describe('175. soda7.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
@@ -566,7 +565,7 @@ describe('175. soda7.js', () => {
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_175_13");
 
       await Promise.all(
@@ -584,9 +583,9 @@ describe('175. soda7.js', () => {
       should.strictEqual(result.count, 2);
 
       let remainingLength = await collection.find().count();
-      should.strictEqual( remainingLength.count, (t_contents.length - result.count) );
+      should.strictEqual(remainingLength.count, (t_contents.length - result.count));
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -598,7 +597,7 @@ describe('175. soda7.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
@@ -610,7 +609,7 @@ describe('175. soda7.js', () => {
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_175_14");
 
       await Promise.all(
@@ -628,9 +627,9 @@ describe('175. soda7.js', () => {
       should.strictEqual(result.count, 0);
 
       let remainingLength = await collection.find().count();
-      should.strictEqual( remainingLength.count, (t_contents.length - result.count) );
+      should.strictEqual(remainingLength.count, (t_contents.length - result.count));
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -642,7 +641,7 @@ describe('175. soda7.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
@@ -654,7 +653,7 @@ describe('175. soda7.js', () => {
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_175_13");
 
       await Promise.all(
@@ -672,7 +671,7 @@ describe('175. soda7.js', () => {
       let remainingLength = await collection.find().count();
       should.strictEqual(remainingLength.count, 0);
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -684,7 +683,7 @@ describe('175. soda7.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }

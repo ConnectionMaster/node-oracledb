@@ -1,4 +1,4 @@
-/* Copyright (c) 2017, 2018, Oracle and/or its affiliates. All rights reserved. */
+/* Copyright (c) 2017, 2021, Oracle and/or its affiliates. All rights reserved. */
 
 /******************************************************************************
  *
@@ -70,14 +70,14 @@ describe('116. fetchUrowidAsString.js', function() {
   });
 
   after('release connection', function(done) {
-    connection.release( function(err) {
+    connection.release(function(err) {
       should.not.exist(err);
       done();
     });
   });
 
   var insertData = function(connection, tableName, callback) {
-    async.forEach(dataArray, function(element, cb) {
+    async.eachSeries(dataArray, function(element, cb) {
       var sql = "INSERT INTO " + tableName + "(num) VALUES(" + element + ")";
       connection.execute(
         sql,
@@ -93,7 +93,7 @@ describe('116. fetchUrowidAsString.js', function() {
   };
 
   var updateDate = function(connection, tableName, callback) {
-    async.forEach(dataArray, function(element, cb) {
+    async.eachSeries(dataArray, function(element, cb) {
       var sql = "UPDATE " + tableName + " T SET content = T.ROWID where num = " + element;
       connection.execute(
         sql,
@@ -580,7 +580,7 @@ describe('116. fetchUrowidAsString.js', function() {
   });
 
   function test1(option, object, array, callback) {
-    async.forEach(dataArray, function(element, cb) {
+    async.eachSeries(dataArray, function(element, cb) {
       var sql = "select content,rowid from " + tableName + " where num = " + element;
       connection.execute(
         sql,
@@ -590,7 +590,7 @@ describe('116. fetchUrowidAsString.js', function() {
           should.not.exist(err);
           var resultVal_1 = result.rows[0][0];
           var resultVal_2 = result.rows[0][1];
-          if(object === true) {
+          if (object === true) {
             resultVal_1 = result.rows[0].CONTENT;
             resultVal_2 = result.rows[0].ROWID;
           }
@@ -606,7 +606,7 @@ describe('116. fetchUrowidAsString.js', function() {
   }
 
   function test2(option, object, array, callback) {
-    async.forEach(dataArray, function(element, cb) {
+    async.eachSeries(dataArray, function(element, cb) {
       var sql = "select content,rowid from " + tableName + " where num = " + element;
       connection.execute(
         sql,
@@ -618,7 +618,7 @@ describe('116. fetchUrowidAsString.js', function() {
             function(err, row) {
               var resultVal_1 = row[0];
               var resultVal_2 = row[1];
-              if(object === true) {
+              if (object === true) {
                 resultVal_1 = row.CONTENT;
                 resultVal_2 = row.ROWID;
               }
@@ -669,6 +669,10 @@ describe('116. fetchUrowidAsString.js', function() {
 
     stream.on('end', function() {
       should.strictEqual(result.length, numRows);
+      stream.destroy();
+    });
+
+    stream.on('close', function() {
       callback();
     });
   }

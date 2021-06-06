@@ -28,11 +28,12 @@
 'use strict';
 
 const oracledb = require('oracledb');
-const should   = require('should');
 const dbconfig = require('./dbconfig.js');
 
 let sodaUtil = exports;
 module.exports = sodaUtil;
+
+let isSodaRoleGranted = false;
 
 sodaUtil.cleanup = async function() {
   let conn;
@@ -42,50 +43,38 @@ sodaUtil.cleanup = async function() {
 
     let cNames = await sd.getCollectionNames();
     if (cNames.length > 0) {
-      console.log("existing collections: ");
-      console.log(cNames);
-
       for (let i = 0; i < cNames.length; i++) {
         let coll = await sd.openCollection(cNames[i]);
-        let res = await coll.drop();
-        if (res.dropped) {
-          console.log("Succeed to drop collection", cNames[i]);
-        } else {
-          console.log("Fail to drop collection", cNames[i]);
-        }
+        await coll.drop();
       }
     }
-
-  } catch(err) {
-    console.log('Error in processing:\n', err);
+  } catch (err) {
+    console.error('Error in processing:\n', err);
   } finally {
     if (conn) {
       try {
         await conn.close();
-      } catch(err) {
-        console.log('Error in closing connection:\n', err);
+      } catch (err) {
+        console.error('Error in closing connection:\n', err);
       }
     }
   }
 
 }; // cleanup()
 
-sodaUtil.grantPrivilege=async function(){
-  try {
-    let credential = {
-      user:          dbconfig.test.DBA_user,
-      password:      dbconfig.test.DBA_password,
-      connectString: dbconfig.connectString,
-      privilege:     oracledb.SYSDBA
-    };
-    const connAsDBA = await oracledb.getConnection(credential);
-
-    let sql = `GRANT SODA_APP TO ${dbconfig.user}`;
-    await connAsDBA.execute(sql);
-  } catch (err) {
-    should.not.exist(err);
+sodaUtil.isSodaRoleGranted = async function() {
+  if (isSodaRoleGranted == false) {
+    let conn = await oracledb.getConnection(dbconfig);
+    let sql = `select count(*) from user_role_privs where GRANTED_ROLE='SODA_APP'`;
+    let result = await conn.execute(sql);
+    if (result.rows[0][0] == 1) {
+      isSodaRoleGranted = true;
+    }
+    await conn.close();
   }
-}; // grantPrivilege()
+
+  return isSodaRoleGranted;
+}; // isSodaRoleGranted()
 
 
 sodaUtil.t_contents = [

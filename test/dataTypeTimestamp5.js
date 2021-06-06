@@ -1,4 +1,4 @@
-/* Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved. */
+/* Copyright (c) 2015, 2021, Oracle and/or its affiliates. All rights reserved. */
 
 /******************************************************************************
  *
@@ -54,7 +54,7 @@ describe('37. dataTypeTimestamp5.js', function() {
   });
 
   after('release connection', function(done) {
-    connection.release( function(err) {
+    connection.release(function(err) {
       should.not.exist(err);
       done();
     });
@@ -63,7 +63,7 @@ describe('37. dataTypeTimestamp5.js', function() {
   describe('37.1 Testing JavaScript Date with database TIMESTAMP WITH LOCAL TIME ZONE', function() {
     var dates = assist.data.dates;
 
-    before('create table, insert data',function(done) {
+    before('create table, insert data', function(done) {
       assist.setUp(connection, tableName, dates, done);
     });
 
@@ -132,7 +132,7 @@ describe('37. dataTypeTimestamp5.js', function() {
       var sql = "SELECT num, TO_CHAR(content AT TIME ZONE '-8:00', 'DD-MM-YYYY HH24:MI:SS.FF TZR') AS TS_DATA FROM "
                  + tableName + " WHERE num = :no";
 
-      async.forEach(timestamps, function(timestamp, cb) {
+      async.eachSeries(timestamps, function(timestamp, cb) {
         var bv = timestamps.indexOf(timestamp);
         connection.execute(
           sql,

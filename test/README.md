@@ -16,7 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 The node-oracledb test suite uses 'mocha', 'should' and 'async'.  See
-[LICENSE](https://github.com/oracle/node-oracledb/blob/master/LICENSE.md)
+[LICENSE](https://github.com/oracle/node-oracledb/blob/main/LICENSE.md)
 for relevant licenses.
 
 ##  <a name="contents"></a> Contents
@@ -52,7 +52,7 @@ ln -s $HOME/Downloads/instantclient_19_8/libclntsh.dylib $(npm root)/oracledb/bu
 ```
 
 Note: the
-[test suite](https://github.com/oracle/node-oracledb/tree/master/test)
+[test suite](https://github.com/oracle/node-oracledb/tree/main/test)
 is on GitHub.
 
 ### <a name="workdir"></a> 1.1 Create a working directory
@@ -156,18 +156,27 @@ This test aims to test the combined usage of external authentication and proxy a
     export NODE_ORACLEDB_PROXY_SESSION_USER "Your_Proxy_Authenticating_User"
 
     ```
+### <a name="externalproxyauth"></a> 3.2 SODA tests
+To execute SODA tests, Oracle Database users require the SODA_APP role granted to them by a DBA. If SODA_APP is not granted, SODA tests will be skipped.
+
+To grant the SODA_APP role to a Oracle Database user, typically a DBA would execute:
+
+    ```
+    grant SODA_APP to <Oracle Database user>
+
+    ```
 
 ## <a name="addtests"></a> 4. Contribute New Tests
 
-See [CONTRIBUTING](https://github.com/oracle/node-oracledb/blob/master/CONTRIBUTING.md)
+See [CONTRIBUTING](https://github.com/oracle/node-oracledb/blob/main/CONTRIBUTING.md)
 for general information on contribution requirements.
 
 For easy correlation between results and test code, each test is
-assigned a number. The [Test List](https://github.com/oracle/node-oracledb/blob/master/test/list.txt)
+assigned a number. The [Test List](https://github.com/oracle/node-oracledb/blob/main/test/list.txt)
 shows the numbering of tests.
 
 In order to include your tests in the suite, add each new test file
-name to [`test/opts/mocha.opts`](https://github.com/oracle/node-oracledb/blob/master/test/opts/mocha.opts).
+name to [`test/opts/mocha.opts`](https://github.com/oracle/node-oracledb/blob/main/test/opts/mocha.opts).
 
 ## <a name="troubleshoot"></a> 5. Troubleshoot
 

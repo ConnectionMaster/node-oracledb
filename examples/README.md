@@ -1,14 +1,15 @@
 # Node-oracledb Examples
 
-This directory contains [node-oracledb](https://www.npmjs.com/package/oracledb) examples.
+This directory contains [node-oracledb](https://www.npmjs.com/package/oracledb)
+examples.  Documentation is [here
+](https://oracle.github.io/node-oracledb/doc/api.html).
 
 To run the examples:
 
 - [Install node-oracledb](https://oracle.github.io/node-oracledb/INSTALL.html#quickstart).
 
-
-- Edit `dbconfig.js` and set your username, password and the database
-connection string, for example:
+- Edit `dbconfig.js` and set your username and the database connection string,
+for example:
 
   ```
   module.exports = {
@@ -19,9 +20,8 @@ connection string, for example:
 
   ```
 
-  This reads the password from the environment variable
-  `NODE_ORACLEDB_PASSWORD`, which you must set before running
-  examples.
+- In a terminal window, set the environment variable `NODE_ORACLEDB_PASSWORD` to
+  the value of your database password.
 
 - Review the samples and then run them like:
 
@@ -58,8 +58,7 @@ File Name                                                 | Description
 [`dbmsoutputpipe.js`](dbmsoutputpipe.js)                  | Show fetching DBMS_OUTPUT by using a pipelined table
 [`demodrop.js`](demodrop.js)                              | Drops the schema objects created by the examples
 [`demosetup.js`](demosetup.js)                            | Used to create common schema objects for the examples
-[`dmlrupd1.js`](dmlrupd1.js)                              | Example of DML RETURNING with a single row match
-[`dmlrupd2.js`](dmlrupd2.js)                              | Example of DML RETURNING where multiple rows are matched
+[`dmlrupd.js`](dmlrupd.js)                                | Example of DML RETURNING where multiple rows are matched
 [`em_batcherrors.js`](em_batcherrors.js)                  | `executeMany()` example showing handling data errors
 [`em_dmlreturn1.js`](em_dmlreturn1.js)                    | `executeMany()` example of DML RETURNING that returns single values
 [`em_dmlreturn2.js`](em_dmlreturn2.js)                    | `executeMany()` example of DML RETURNING that returns multiple values
@@ -73,6 +72,7 @@ File Name                                                 | Description
 [`impres.js`](impres.js)                                  | Shows PL/SQL 'Implict Results' returning multiple query results from PL/SQL code.
 [`insert1.js`](insert1.js)                                | Basic example creating a table and inserting data.  Shows DDL and DML
 [`insert2.js`](insert2.js)                                | Basic example showing auto commit behavior
+[`lastinsertid.js`](lastinsertid.js)                      | Shows inserting a row and getting its ROWID.
 [`lobbinds.js`](lobbinds.js)                              | Demonstrates how to bind and query LOBs
 [`lobinsert1.js`](lobinsert1.js)                          | Shows inserting a file into a CLOB column
 [`lobinsert2.js`](lobinsert2.js)                          | Inserts text into a CLOB column using the RETURNING INTO method.

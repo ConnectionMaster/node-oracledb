@@ -43,15 +43,14 @@ describe('165. soda2.js', () => {
     }
 
     await sodaUtil.cleanup();
-    await sodaUtil.grantPrivilege();
   });
 
   it('165.1 create two sodaDatabase objects which point to the same instance', async () => {
     let conn;
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let sd1 = await conn.getSodaDatabase();
-      let sd2 = await conn.getSodaDatabase();
+      let sd1 = conn.getSodaDatabase();
+      let sd2 = conn.getSodaDatabase();
       // sd1 creates the collection
       let collName = "soda_test_165_1";
       let coll_create = await sd1.createCollection(collName);
@@ -59,13 +58,13 @@ describe('165. soda2.js', () => {
       let coll_open = await sd2.openCollection(collName);
       should.exist(coll_open);
       await coll_create.drop();
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
@@ -85,23 +84,23 @@ describe('165. soda2.js', () => {
       let coll = await sd1.createCollection(t_collname);
 
       let cNames = await sd2.getCollectionNames();
-      should.deepEqual(cNames, [ t_collname ] );
+      should.deepEqual(cNames, [ t_collname ]);
 
       await coll.drop();
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       if (conn1) {
         try {
           await conn1.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
       if (conn2) {
         try {
           await conn2.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
@@ -112,23 +111,23 @@ describe('165. soda2.js', () => {
     let conn;
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let sd = await conn.getSodaDatabase();
+      let sd = conn.getSodaDatabase();
 
       let t_collname = "soda_test_165_3";
       await sd.createCollection(t_collname);
       let coll = await sd.createCollection(t_collname);
 
       let cNames = await sd.getCollectionNames();
-      should.deepEqual(cNames, [ t_collname ] );
+      should.deepEqual(cNames, [ t_collname ]);
 
       await coll.drop();
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
@@ -139,7 +138,7 @@ describe('165. soda2.js', () => {
     let conn, coll;
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let sd = await conn.getSodaDatabase();
+      let sd = conn.getSodaDatabase();
 
       let collName = "";
       await testsUtil.assertThrowsAsync(
@@ -148,13 +147,13 @@ describe('165. soda2.js', () => {
       );
       // ORA-40658: Collection name cannot be null for this operation.
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       if (coll) {
         try {
           await coll.drop();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
@@ -162,7 +161,7 @@ describe('165. soda2.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
@@ -176,7 +175,7 @@ describe('165. soda2.js', () => {
 
     try {
       await prepareCollection(collectionName);
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     }
 
@@ -192,13 +191,13 @@ describe('165. soda2.js', () => {
 
       await pool.close();
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     }
 
     try {
       await dropCollection(collectionName);
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     }
 
@@ -206,7 +205,7 @@ describe('165. soda2.js', () => {
 
       try {
         let conn = await oracledb.getConnection(dbconfig);
-        let soda = await conn.getSodaDatabase();
+        let soda = conn.getSodaDatabase();
         let collection = await soda.createCollection(collName);
         let indexSpec = {
           "name": "OFFICE_IDX",
@@ -222,7 +221,7 @@ describe('165. soda2.js', () => {
         await conn.commit();
         await conn.close();
 
-      } catch(err) {
+      } catch (err) {
         should.not.exist(err);
       }
 
@@ -232,14 +231,14 @@ describe('165. soda2.js', () => {
 
       try {
         let conn = await pool.getConnection();
-        let soda = await conn.getSodaDatabase();
+        let soda = conn.getSodaDatabase();
         let collection = await soda.openCollection(collName);
 
         await collection.insertOne(content);
 
         await conn.commit();
         await conn.close();
-      } catch(err) {
+      } catch (err) {
         should.not.exist(err);
       }
     } // insertDocument()
@@ -248,7 +247,7 @@ describe('165. soda2.js', () => {
 
       try {
         let conn = await oracledb.getConnection(dbconfig);
-        let soda = await conn.getSodaDatabase();
+        let soda = conn.getSodaDatabase();
         let collection = await soda.openCollection(collName);
 
         let result = await collection.drop();
@@ -257,7 +256,7 @@ describe('165. soda2.js', () => {
         await conn.commit();
         await conn.close();
 
-      } catch(err) {
+      } catch (err) {
         should.not.exist(err);
       }
     } // dropCollection()

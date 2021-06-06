@@ -1,4 +1,4 @@
-/* Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved. */
+/* Copyright (c) 2020, 2021, Oracle and/or its affiliates. All rights reserved. */
 
 /******************************************************************************
  *
@@ -39,12 +39,12 @@ describe('224. booleanBind.js', function()  {
 
   const pkgName = 'NODB_PKG_TEST_BOOLEANS';
   before(async function() {
-    isRunnable = await testsUtil.checkPrerequisites(1200000000, 1200000000);
-    if(!isRunnable) {
+    isRunnable = await testsUtil.checkPrerequisites(1200000000, 1202000000);
+    if (!isRunnable) {
       this.skip();
     }
 
-    let plsqlPkg =`
+    let plsqlPkg = `
       create or replace package ${pkgName} as
 
           type udt_BooleanList is table of boolean index by binary_integer;
@@ -149,7 +149,7 @@ describe('224. booleanBind.js', function()  {
   }); // before()
 
   after(async function() {
-    if(!isRunnable) {
+    if (!isRunnable) {
       return;
     }
 

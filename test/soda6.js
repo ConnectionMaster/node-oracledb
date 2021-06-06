@@ -35,7 +35,7 @@ const testsUtil = require('./testsUtil.js');
 
 const t_contents = sodaUtil.t_contents;
 
-describe('174. soda6.js', () => {
+describe('174. soda6.js', function() {
 
   before(async function() {
     const runnable = await testsUtil.isSodaRunnable();
@@ -45,15 +45,14 @@ describe('174. soda6.js', () => {
     }
 
     await sodaUtil.cleanup();
-    await sodaUtil.grantPrivilege();
   });
 
-  it('174.1 filter() basic case', async () => {
+  it('174.1 filter() basic case', async function() {
     let conn, collection;
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_174_1");
 
       await Promise.all(
@@ -70,7 +69,7 @@ describe('174. soda6.js', () => {
 
       await conn.commit();
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       if (collection) {
@@ -80,19 +79,19 @@ describe('174. soda6.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
     }
   }); // 174.1
 
-  it('174.2 Negative - fiter(filterSpec) when filterSpec is null', async () => {
+  it('174.2 Negative - fiter(filterSpec) when filterSpec is null', async function() {
     let conn, collection;
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_174_2");
 
       await Promise.all(
@@ -107,7 +106,7 @@ describe('174. soda6.js', () => {
         /NJS-009: invalid number of parameters/
       );
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -118,19 +117,19 @@ describe('174. soda6.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
     }
   }); // 174.2
 
-  it('174.3 filterSpec is OK to be an empty object', async () => {
+  it('174.3 filterSpec is OK to be an empty object', async function() {
     let conn, collection;
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_174_3");
 
       await Promise.all(
@@ -145,7 +144,7 @@ describe('174. soda6.js', () => {
         .count();
       should.strictEqual(empInShenzhen.count, t_contents.length);
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -156,19 +155,19 @@ describe('174. soda6.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
     }
   }); // 174.3
 
-  it('174.4 Key(), basic case', async () => {
+  it('174.4 Key(), basic case', async function() {
     let conn, collection;
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_174_4");
 
       await Promise.all(
@@ -185,7 +184,7 @@ describe('174. soda6.js', () => {
 
       // Fetch it back
       let doc2 = await collection.find().key(key1).getOne();
-      let content2 = await doc2.getContent();
+      let content2 = doc2.getContent();
       should.deepEqual(content2, content1);
 
 
@@ -196,7 +195,7 @@ describe('174. soda6.js', () => {
 
       await conn.commit();
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       if (collection) {
@@ -206,19 +205,19 @@ describe('174. soda6.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
     }
   }); // 174.4
 
-  it('174.5 Key(), no matched key', async () => {
+  it('174.5 Key(), no matched key', async function() {
     let conn, collection;
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_174_5");
 
       await Promise.all(
@@ -233,7 +232,7 @@ describe('174. soda6.js', () => {
       should.not.exist(doc2);
       await conn.commit();
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
 
@@ -244,19 +243,19 @@ describe('174. soda6.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
     }
   }); // 174.5
 
-  it('174.6 Negative - Key(null)', async () => {
+  it('174.6 Negative - Key(null)', async function() {
     let conn, collection;
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_174_6");
 
       await Promise.all(
@@ -270,7 +269,7 @@ describe('174. soda6.js', () => {
         /NJS-009: invalid number of parameters/
       );
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -281,19 +280,19 @@ describe('174. soda6.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
     }
   }); // 174.6
 
-  it('174.7 Key(), invalid type', async () => {
+  it('174.7 Key(), invalid type', async function() {
     let conn, collection;
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_174_7");
 
       await Promise.all(
@@ -309,7 +308,7 @@ describe('174. soda6.js', () => {
         /NJS-005: invalid value for parameter 1/
       );
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -320,19 +319,19 @@ describe('174. soda6.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
     }
   }); // 174.7
 
-  it('174.8 Keys(), basic case', async () => {
+  it('174.8 Keys(), basic case', async function() {
     let conn, collection;
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_174_8");
 
       let myKeys = [];
@@ -347,12 +346,12 @@ describe('174. soda6.js', () => {
 
       // Get contents
       let myContents = [];
-      for (let i = 0; i < documents.length; i++ ) {
-        myContents[i] = await documents[i].getContent();
+      for (let i = 0; i < documents.length; i++) {
+        myContents[i] = documents[i].getContent();
         (myContents[i]).should.be.oneOf(t_contents);
       }
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -364,19 +363,19 @@ describe('174. soda6.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
     }
   }); // 174.8
 
-  it('174.9 Keys([]) empty array, it selects all documents', async () => {
+  it('174.9 Keys([]) empty array, it selects all documents', async function() {
     let conn, collection;
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_174_9");
 
       await Promise.all(
@@ -390,13 +389,13 @@ describe('174. soda6.js', () => {
 
       // Get contents
       let myContents = [];
-      for (let i = 0; i < documents.length; i++ ) {
-        myContents[i] = await documents[i].getContent();
+      for (let i = 0; i < documents.length; i++) {
+        myContents[i] = documents[i].getContent();
         (myContents[i]).should.be.oneOf(t_contents);
       }
 
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -408,19 +407,19 @@ describe('174. soda6.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
     }
   }); // 174.9
 
-  it('174.10 Negative - keys() no parameter', async () => {
+  it('174.10 Negative - keys() no parameter', async function() {
     let conn, collection;
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_174_10");
 
       await Promise.all(
@@ -434,7 +433,7 @@ describe('174. soda6.js', () => {
         /NJS-009: invalid number of parameters/
       );
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -446,19 +445,19 @@ describe('174. soda6.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
     }
   }); // 174.10
 
-  it('174.11 Negative - keys(null)', async () => {
+  it('174.11 Negative - keys(null)', async function() {
     let conn, collection;
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_174_11");
 
       await Promise.all(
@@ -473,7 +472,7 @@ describe('174. soda6.js', () => {
         /NJS-005: invalid value for parameter 1/
       );
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -485,19 +484,19 @@ describe('174. soda6.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
     }
   }); // 174.11
 
-  it('174.12 try to query documents with nonexistent keys', async () => {
+  it('174.12 try to query documents with nonexistent keys', async function() {
     let conn, collection;
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_174_12");
 
       let myKeys = [];
@@ -516,7 +515,7 @@ describe('174. soda6.js', () => {
 
       should.strictEqual(result.count, 0);
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -528,11 +527,152 @@ describe('174. soda6.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
     }
   }); // 174.12
+
+  it("174.13 hint(), basic case", async function() {
+    // The SODA hint is available with Oracle Client 21.3 and
+    // in 19 from 19.11
+    if (oracledb.oracleClientVersion < 2103000000) {
+      if (oracledb.oracleClientVersion < 1911000000 ||
+          oracledb.oracleClientVersion >= 2000000000) {
+        this.skip();
+        return;
+      }
+    }
+    let conn, collection;
+
+    try {
+      conn = await oracledb.getConnection(dbconfig);
+      let soda = conn.getSodaDatabase();
+      collection = await soda.createCollection("soda_test_174_13");
+
+      let options = {hint: "MONITOR"};
+      for (let i = 0; i < t_contents.length; i++) {
+        let content = t_contents[i];
+        await collection.insertOneAndGet(content, options);
+      }
+
+      // Fetch back
+      await collection
+        .find()
+        .hint("MONITOR");
+
+    } catch (err) {
+      should.not.exist(err);
+    } finally {
+      await conn.commit();
+
+      if (collection) {
+        let res = await collection.drop();
+        should.strictEqual(res.dropped, true);
+      }
+      if (conn) {
+        try {
+          await conn.close();
+        } catch (err) {
+          should.not.exist(err);
+        }
+      }
+    }
+  }); //174.13
+
+  it("174.14 Negative - hint() no parameter", async function() {
+    // The SODA hint is available with Oracle Client 21.3 and
+    // in 19 from 19.11
+    if (oracledb.oracleClientVersion < 2103000000) {
+      if (oracledb.oracleClientVersion < 1911000000 ||
+          oracledb.oracleClientVersion >= 2000000000) {
+        this.skip();
+        return;
+      }
+    }
+    let conn, collection;
+
+    try {
+      conn = await oracledb.getConnection(dbconfig);
+      let soda = conn.getSodaDatabase();
+      collection = await soda.createCollection("soda_test_174_14");
+
+      let options = {hint: "MONITOR"};
+      for (let i = 0; i < t_contents.length; i++) {
+        let content = t_contents[i];
+        await collection.insertOneAndGet(content, options);
+      }
+
+      // Fetch back
+      await collection
+        .find()
+        .hint();
+
+    } catch (err) {
+      (err.message).should.startWith('NJS-009:');
+    } finally {
+      await conn.commit();
+
+      if (collection) {
+        let res = await collection.drop();
+        should.strictEqual(res.dropped, true);
+      }
+      if (conn) {
+        try {
+          await conn.close();
+        } catch (err) {
+          should.not.exist(err);
+        }
+      }
+    }
+  }); //174.14
+
+  it("174.15 Negative - hint() invalid parameter type", async function() {
+    // The SODA hint is available with Oracle Client 21.3 and
+    // in 19 from 19.11
+    if (oracledb.oracleClientVersion < 2103000000) {
+      if (oracledb.oracleClientVersion < 1911000000 ||
+          oracledb.oracleClientVersion >= 2000000000) {
+        this.skip();
+        return;
+      }
+    }
+    let conn, collection;
+
+    try {
+      conn = await oracledb.getConnection(dbconfig);
+      let soda = conn.getSodaDatabase();
+      collection = await soda.createCollection("soda_test_174_15");
+
+      let options = {hint: "MONITOR"};
+      for (let i = 0; i < t_contents.length; i++) {
+        let content = t_contents[i];
+        await collection.insertOneAndGet(content, options);
+      }
+
+      // Fetch back
+      await collection
+        .find()
+        .hint(1);
+
+    } catch (err) {
+      (err.message).should.startWith('NJS-005:');
+    } finally {
+      await conn.commit();
+
+      if (collection) {
+        let res = await collection.drop();
+        should.strictEqual(res.dropped, true);
+      }
+      if (conn) {
+        try {
+          await conn.close();
+        } catch (err) {
+          should.not.exist(err);
+        }
+      }
+    }
+  }); //174.15
 
 });

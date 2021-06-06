@@ -1,4 +1,4 @@
-/* Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved. */
+/* Copyright (c) 2015, 2021, Oracle and/or its affiliates. All rights reserved. */
 
 /******************************************************************************
  *
@@ -55,7 +55,7 @@ describe('34. dataTypeTimestamp2.js', function() {
 
   after('release connection', function(done) {
     oracledb.fetchAsString = [];
-    connection.release( function(err) {
+    connection.release(function(err) {
       should.not.exist(err);
       done();
     });
@@ -64,7 +64,7 @@ describe('34. dataTypeTimestamp2.js', function() {
   describe('34.1 Testing JavaScript Date with database TIMESTAMP(p)', function() {
     var dates = assist.data.dates;
 
-    before('create table, insert data',function(done) {
+    before('create table, insert data', function(done) {
       assist.setUp(connection, tableName, dates, done);
     });
 
@@ -102,7 +102,7 @@ describe('34. dataTypeTimestamp2.js', function() {
 
   }); // end of 34.1 suite
 
-  describe('34.2 sotres null value correctly', function() {
+  describe('34.2 stores null value correctly', function() {
     it('34.2.1 testing Null, Empty string and Undefined', function(done) {
       assist.verifyNullValues(connection, tableName, done);
     });
@@ -130,7 +130,7 @@ describe('34. dataTypeTimestamp2.js', function() {
     });
 
     it('34.3.2 SELECT query - formatted data for comparison', function(done) {
-      async.forEach(timestamps, function(timestamp, cb) {
+      async.eachSeries(timestamps, function(timestamp, cb) {
         var bv = timestamps.indexOf(timestamp);
         connection.execute(
           "SELECT num, TO_CHAR(content, 'DD-MM-YYYY HH24:MI:SS.FF') AS TS_DATA FROM " + tableName + " WHERE num = :no",

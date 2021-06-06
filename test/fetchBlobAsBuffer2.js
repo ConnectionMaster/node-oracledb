@@ -1,4 +1,4 @@
-/* Copyright (c) 2017, 2018, Oracle and/or its affiliates. All rights reserved. */
+/* Copyright (c) 2017, 2021, Oracle and/or its affiliates. All rights reserved. */
 
 /******************************************************************************
  *
@@ -98,7 +98,7 @@ describe('88. fetchBlobAsBuffer2.js', function() {
 
   // Generic function to insert a single row given ID, and data
   var insertIntoBlobTable1 = function(id, content, callback) {
-    if(content == "EMPTY_BLOB") {
+    if (content == "EMPTY_BLOB") {
       connection.execute(
         "INSERT INTO nodb_blob1 VALUES (:ID, EMPTY_BLOB())",
         [ id ],
@@ -128,7 +128,7 @@ describe('88. fetchBlobAsBuffer2.js', function() {
     connection.execute(
       "UPDATE nodb_blob1 set B = :B where ID = :ID",
       { ID: id, B: content },
-      function(err, result){
+      function(err, result) {
         should.not.exist(err);
         should.strictEqual(result.rowsAffected, 1);
         callback();
@@ -186,7 +186,7 @@ describe('88. fetchBlobAsBuffer2.js', function() {
             },
             function(err, result) {
               var resultVal = result.rows[0][1];
-              if(specialStr === null) {
+              if (specialStr === null) {
                 should.equal(resultVal, null);
               } else {
                 compareClientFetchResult(err, resultVal, specialStr, insertContent, insertContentLength);
@@ -422,7 +422,7 @@ describe('88. fetchBlobAsBuffer2.js', function() {
         },
         function(cb) {
           connection.execute(
-            "SELECT ID, B from nodb_blob1 WHERE id = " + id_1 + " or id = " +id_2,
+            "SELECT ID, B from nodb_blob1 WHERE id = " + id_1 + " or id = " + id_2,
             { },
             {
               fetchInfo : { B : { type : oracledb.BUFFER } }
@@ -463,7 +463,7 @@ describe('88. fetchBlobAsBuffer2.js', function() {
         },
         function(cb) {
           connection.execute(
-            "SELECT ID, B from nodb_blob1 WHERE id = " + id_1 + " or id = " +id_2,
+            "SELECT ID, B from nodb_blob1 WHERE id = " + id_1 + " or id = " + id_2,
             { },
             {
               fetchInfo : { B : { type : oracledb.BUFFER } }
@@ -484,33 +484,37 @@ describe('88. fetchBlobAsBuffer2.js', function() {
     }); // 88.1.13
 
     it('88.1.14 works with connection.queryStream()', function(done) {
-      var id = insertID++;
-      var specialStr = '88.1.14';
-      var contentLength = 200;
-      var strBuf = random.getRandomString(contentLength, specialStr);
-      var content = Buffer.from(strBuf, "utf-8");
+      const id = insertID++;
+      const specialStr = '88.1.14';
+      const contentLength = 200;
+      const strBuf = random.getRandomString(contentLength, specialStr);
+      const content = Buffer.from(strBuf, "utf-8");
 
       async.series([
         function(cb) {
           insertIntoBlobTable1(id, content, cb);
         },
         function(cb) {
-          var sql = "SELECT ID, B from nodb_blob1 WHERE ID = " + id;
-          var stream = connection.queryStream(sql, {}, { fetchInfo : { B : { type : oracledb.BUFFER } } });
-          stream.on('error', function (error) {
+          const sql = "SELECT ID, B from nodb_blob1 WHERE ID = " + id;
+          const stream = connection.queryStream(sql, {}, { fetchInfo : { B : { type : oracledb.BUFFER } } });
+          stream.on('error', function(error) {
             should.fail(error, null, 'Error event should not be triggered');
           });
 
-          var counter = 0;
+          let counter = 0;
           stream.on('data', function(data) {
             should.exist(data);
-            var result = data[1];
+            const result = data[1];
             compareBuffers(result, specialStr, content, contentLength);
             counter++;
           });
 
-          stream.on('end', function () {
+          stream.on('end', function() {
             should.equal(counter, 1);
+            stream.destroy();
+          });
+
+          stream.on('close', function() {
             cb();
           });
         }
@@ -518,17 +522,17 @@ describe('88. fetchBlobAsBuffer2.js', function() {
     }); // 88.1.14
 
     it('88.1.15 works with connection.queryStream() and oracledb.maxRows > actual number of rows in the table', function(done) {
-      var id_1 = insertID++;
-      var specialStr_1 = '88.1.15_1';
-      var contentLength_1 = 26;
-      var strBuf_1 = random.getRandomString(contentLength_1, specialStr_1);
-      var content_1 = Buffer.from(strBuf_1, "utf-8");
-      var id_2 = insertID++;
-      var specialStr_2 = '88.1.15_2';
-      var contentLength_2 = 30;
-      var strBuf_2 = random.getRandomString(contentLength_2, specialStr_2);
-      var content_2 = Buffer.from(strBuf_2, "utf-8");
-      var maxRowsBak = oracledb.maxRows;
+      const id_1 = insertID++;
+      const specialStr_1 = '88.1.15_1';
+      const contentLength_1 = 26;
+      const strBuf_1 = random.getRandomString(contentLength_1, specialStr_1);
+      const content_1 = Buffer.from(strBuf_1, "utf-8");
+      const id_2 = insertID++;
+      const specialStr_2 = '88.1.15_2';
+      const contentLength_2 = 30;
+      const strBuf_2 = random.getRandomString(contentLength_2, specialStr_2);
+      const content_2 = Buffer.from(strBuf_2, "utf-8");
+      const maxRowsBak = oracledb.maxRows;
       oracledb.maxRows = 20;
 
       async.series([
@@ -539,27 +543,31 @@ describe('88. fetchBlobAsBuffer2.js', function() {
           insertIntoBlobTable1(id_2, content_2, cb);
         },
         function(cb) {
-          var sql = "SELECT ID, B from nodb_blob1 WHERE ID = " + id_1 + " or id = " +id_2;
-          var stream = connection.queryStream(sql, {}, { fetchInfo : { B : { type : oracledb.BUFFER } } });
-          stream.on('error', function (error) {
+          const sql = "SELECT ID, B from nodb_blob1 WHERE ID = " + id_1 + " or id = " + id_2;
+          const stream = connection.queryStream(sql, {}, { fetchInfo : { B : { type : oracledb.BUFFER } } });
+          stream.on('error', function(error) {
             should.fail(error, null, 'Error event should not be triggered');
           });
 
-          var counter = 0;
+          let counter = 0;
           stream.on('data', function(data) {
             should.exist(data);
-            var result = data[1];
+            const result = data[1];
             counter++;
-            if(counter == 1) {
+            if (counter == 1) {
               compareBuffers(result, specialStr_1, content_1, contentLength_1);
             } else {
               compareBuffers(result, specialStr_2, content_2, contentLength_2);
             }
           });
 
-          stream.on('end', function () {
+          stream.on('end', function() {
             should.equal(counter, 2);
             oracledb.maxRows = maxRowsBak;
+            stream.destroy();
+          });
+
+          stream.on('close', function() {
             cb();
           });
         }
@@ -567,17 +575,17 @@ describe('88. fetchBlobAsBuffer2.js', function() {
     }); // 88.1.15
 
     it('88.1.16 works with connection.queryStream() and oracledb.maxRows = actual number of rows in the table', function(done) {
-      var id_1 = insertID++;
-      var specialStr_1 = '88.1.16_1';
-      var contentLength_1 = 26;
-      var strBuf_1 = random.getRandomString(contentLength_1, specialStr_1);
-      var content_1 = Buffer.from(strBuf_1, "utf-8");
-      var id_2 = insertID++;
-      var specialStr_2 = '88.1.16_2';
-      var contentLength_2 = 30;
-      var strBuf_2 = random.getRandomString(contentLength_2, specialStr_2);
-      var content_2 = Buffer.from(strBuf_2, "utf-8");
-      var maxRowsBak = oracledb.maxRows;
+      const id_1 = insertID++;
+      const specialStr_1 = '88.1.16_1';
+      const contentLength_1 = 26;
+      const strBuf_1 = random.getRandomString(contentLength_1, specialStr_1);
+      const content_1 = Buffer.from(strBuf_1, "utf-8");
+      const id_2 = insertID++;
+      const specialStr_2 = '88.1.16_2';
+      const contentLength_2 = 30;
+      const strBuf_2 = random.getRandomString(contentLength_2, specialStr_2);
+      const content_2 = Buffer.from(strBuf_2, "utf-8");
+      const maxRowsBak = oracledb.maxRows;
       oracledb.maxRows = 2;
 
       async.series([
@@ -588,27 +596,31 @@ describe('88. fetchBlobAsBuffer2.js', function() {
           insertIntoBlobTable1(id_2, content_2, cb);
         },
         function(cb) {
-          var sql = "SELECT ID, B from nodb_blob1 WHERE ID = " + id_1 + " or id = " +id_2;
-          var stream = connection.queryStream(sql, {}, { fetchInfo : { B : { type : oracledb.BUFFER } } });
-          stream.on('error', function (error) {
+          const sql = "SELECT ID, B from nodb_blob1 WHERE ID = " + id_1 + " or id = " + id_2;
+          const stream = connection.queryStream(sql, {}, { fetchInfo : { B : { type : oracledb.BUFFER } } });
+          stream.on('error', function(error) {
             should.fail(error, null, 'Error event should not be triggered');
           });
 
-          var counter = 0;
+          let counter = 0;
           stream.on('data', function(data) {
             should.exist(data);
-            var result = data[1];
+            const result = data[1];
             counter++;
-            if(counter == 1) {
+            if (counter == 1) {
               compareBuffers(result, specialStr_1, content_1, contentLength_1);
             } else {
               compareBuffers(result, specialStr_2, content_2, contentLength_2);
             }
           });
 
-          stream.on('end', function () {
+          stream.on('end', function() {
             should.equal(counter, 2);
             oracledb.maxRows = maxRowsBak;
+            stream.destroy();
+          });
+
+          stream.on('close', function() {
             cb();
           });
         }
@@ -616,17 +628,17 @@ describe('88. fetchBlobAsBuffer2.js', function() {
     }); // 88.1.16
 
     it('88.1.17 works with connection.queryStream() and oracledb.maxRows < actual number of rows in the table', function(done) {
-      var id_1 = insertID++;
-      var specialStr_1 = '88.1.17_1';
-      var contentLength_1 = 26;
-      var strBuf_1 = random.getRandomString(contentLength_1, specialStr_1);
-      var content_1 = Buffer.from(strBuf_1, "utf-8");
-      var id_2 = insertID++;
-      var specialStr_2 = '88.1.17_2';
-      var contentLength_2 = 30;
-      var strBuf_2 = random.getRandomString(contentLength_2, specialStr_2);
-      var content_2 = Buffer.from(strBuf_2, "utf-8");
-      var maxRowsBak = oracledb.maxRows;
+      const id_1 = insertID++;
+      const specialStr_1 = '88.1.17_1';
+      const contentLength_1 = 26;
+      const strBuf_1 = random.getRandomString(contentLength_1, specialStr_1);
+      const content_1 = Buffer.from(strBuf_1, "utf-8");
+      const id_2 = insertID++;
+      const specialStr_2 = '88.1.17_2';
+      const contentLength_2 = 30;
+      const strBuf_2 = random.getRandomString(contentLength_2, specialStr_2);
+      const content_2 = Buffer.from(strBuf_2, "utf-8");
+      const maxRowsBak = oracledb.maxRows;
       oracledb.maxRows = 1;
 
       async.series([
@@ -637,27 +649,31 @@ describe('88. fetchBlobAsBuffer2.js', function() {
           insertIntoBlobTable1(id_2, content_2, cb);
         },
         function(cb) {
-          var sql = "SELECT ID, B from nodb_blob1 WHERE ID = " + id_1 + " or id = " +id_2;
-          var stream = connection.queryStream(sql, {}, { fetchInfo : { B : { type : oracledb.BUFFER } } });
-          stream.on('error', function (error) {
+          const sql = "SELECT ID, B from nodb_blob1 WHERE ID = " + id_1 + " or id = " + id_2;
+          const stream = connection.queryStream(sql, {}, { fetchInfo : { B : { type : oracledb.BUFFER } } });
+          stream.on('error', function(error) {
             should.fail(error, null, 'Error event should not be triggered');
           });
 
-          var counter = 0;
+          let counter = 0;
           stream.on('data', function(data) {
             should.exist(data);
-            var result = data[1];
+            const result = data[1];
             counter++;
-            if(counter == 1) {
+            if (counter == 1) {
               compareBuffers(result, specialStr_1, content_1, contentLength_1);
             } else {
               compareBuffers(result, specialStr_2, content_2, contentLength_2);
             }
           });
 
-          stream.on('end', function () {
+          stream.on('end', function() {
             should.equal(counter, 2);
             oracledb.maxRows = maxRowsBak;
+            stream.destroy();
+          });
+
+          stream.on('close', function() {
             cb();
           });
         }
@@ -704,7 +720,7 @@ describe('88. fetchBlobAsBuffer2.js', function() {
             },
             function(err, result) {
               var resultVal = result.rows[0].B;
-              if(specialStr === null) {
+              if (specialStr === null) {
                 should.not.exist(err);
                 should.equal(resultVal, null);
               } else {
@@ -945,7 +961,7 @@ describe('88. fetchBlobAsBuffer2.js', function() {
         },
         function(cb) {
           connection.execute(
-            "SELECT ID, B from nodb_blob1 WHERE id = " + id_1 + " or id = " +id_2,
+            "SELECT ID, B from nodb_blob1 WHERE id = " + id_1 + " or id = " + id_2,
             { },
             {
               outFormat : oracledb.OUT_FORMAT_OBJECT,
@@ -987,7 +1003,7 @@ describe('88. fetchBlobAsBuffer2.js', function() {
         },
         function(cb) {
           connection.execute(
-            "SELECT ID, B from nodb_blob1 WHERE id = " + id_1 + " or id = " +id_2,
+            "SELECT ID, B from nodb_blob1 WHERE id = " + id_1 + " or id = " + id_2,
             { },
             {
               outFormat : oracledb.OUT_FORMAT_OBJECT,
@@ -1053,7 +1069,7 @@ describe('88. fetchBlobAsBuffer2.js', function() {
                 function(err, row) {
                   var resultVal;
                   resultVal = row.B;
-                  if(specialStr === null) {
+                  if (specialStr === null) {
                     should.not.exist(err);
                     should.equal(resultVal, null);
                   } else {
@@ -1336,7 +1352,7 @@ describe('88. fetchBlobAsBuffer2.js', function() {
         },
         function(cb) {
           connection.execute(
-            "SELECT ID, B from nodb_blob1 WHERE id = " + id_1 + " or id = " +id_2,
+            "SELECT ID, B from nodb_blob1 WHERE id = " + id_1 + " or id = " + id_2,
             { },
             {
               outFormat : oracledb.OUT_FORMAT_OBJECT,
@@ -1355,7 +1371,7 @@ describe('88. fetchBlobAsBuffer2.js', function() {
                   compareClientFetchResult(err, resultVal, specialStr_1, content_1, contentLength_1);
                   resultVal = row[1].B;
                   compareClientFetchResult(err, resultVal, specialStr_2, content_2, contentLength_2);
-                  oracledb.maxRows =maxRowsBak;
+                  oracledb.maxRows = maxRowsBak;
                   result.resultSet.close(function(err) {
                     should.not.exist(err);
                     cb();
@@ -1391,7 +1407,7 @@ describe('88. fetchBlobAsBuffer2.js', function() {
         },
         function(cb) {
           connection.execute(
-            "SELECT ID, B from nodb_blob1 WHERE id = " + id_1 + " or id = " +id_2,
+            "SELECT ID, B from nodb_blob1 WHERE id = " + id_1 + " or id = " + id_2,
             { },
             {
               outFormat : oracledb.OUT_FORMAT_OBJECT,
@@ -1410,7 +1426,7 @@ describe('88. fetchBlobAsBuffer2.js', function() {
                   compareClientFetchResult(err, resultVal, specialStr_1, content_1, contentLength_1);
                   resultVal = row[1].B;
                   compareClientFetchResult(err, resultVal, specialStr_2, content_2, contentLength_2);
-                  oracledb.maxRows =maxRowsBak;
+                  oracledb.maxRows = maxRowsBak;
                   result.resultSet.close(function(err) {
                     should.not.exist(err);
                     cb();
@@ -1463,7 +1479,7 @@ describe('88. fetchBlobAsBuffer2.js', function() {
             },
             function(err, result) {
               var resultVal = result.rows[0][1];
-              if(specialStr === null) {
+              if (specialStr === null) {
                 should.not.exist(err);
                 should.equal(resultVal, null);
               } else {
@@ -1703,7 +1719,7 @@ describe('88. fetchBlobAsBuffer2.js', function() {
         },
         function(cb) {
           connection.execute(
-            "SELECT ID, B from nodb_blob1 WHERE id = " + id_1 + " or id = " +id_2,
+            "SELECT ID, B from nodb_blob1 WHERE id = " + id_1 + " or id = " + id_2,
             { },
             {
               outFormat : oracledb.OUT_FORMAT_ARRAY,
@@ -1745,7 +1761,7 @@ describe('88. fetchBlobAsBuffer2.js', function() {
         },
         function(cb) {
           connection.execute(
-            "SELECT ID, B from nodb_blob1 WHERE id = " + id_1 + " or id = " +id_2,
+            "SELECT ID, B from nodb_blob1 WHERE id = " + id_1 + " or id = " + id_2,
             { },
             {
               outFormat : oracledb.OUT_FORMAT_ARRAY,
@@ -1811,7 +1827,7 @@ describe('88. fetchBlobAsBuffer2.js', function() {
                 function(err, row) {
                   var resultVal;
                   resultVal = row[1];
-                  if(specialStr === null) {
+                  if (specialStr === null) {
                     should.not.exist(err);
                     should.equal(resultVal, null);
                   } else {
@@ -2095,7 +2111,7 @@ describe('88. fetchBlobAsBuffer2.js', function() {
         },
         function(cb) {
           connection.execute(
-            "SELECT ID, B from nodb_blob1 WHERE id = " + id_1 + " or id = " +id_2,
+            "SELECT ID, B from nodb_blob1 WHERE id = " + id_1 + " or id = " + id_2,
             { },
             {
               outFormat : oracledb.OUT_FORMAT_ARRAY,
@@ -2114,7 +2130,7 @@ describe('88. fetchBlobAsBuffer2.js', function() {
                   compareClientFetchResult(err, resultVal, specialStr_1, content_1, contentLength_1);
                   resultVal = row[1][1];
                   compareClientFetchResult(err, resultVal, specialStr_2, content_2, contentLength_2);
-                  oracledb.maxRows =maxRowsBak;
+                  oracledb.maxRows = maxRowsBak;
                   result.resultSet.close(function(err) {
                     should.not.exist(err);
                     cb();
@@ -2150,7 +2166,7 @@ describe('88. fetchBlobAsBuffer2.js', function() {
         },
         function(cb) {
           connection.execute(
-            "SELECT ID, B from nodb_blob1 WHERE id = " + id_1 + " or id = " +id_2,
+            "SELECT ID, B from nodb_blob1 WHERE id = " + id_1 + " or id = " + id_2,
             { },
             {
               outFormat : oracledb.OUT_FORMAT_ARRAY,
@@ -2169,7 +2185,7 @@ describe('88. fetchBlobAsBuffer2.js', function() {
                   compareClientFetchResult(err, resultVal, specialStr_1, content_1, contentLength_1);
                   resultVal = row[1][1];
                   compareClientFetchResult(err, resultVal, specialStr_2, content_2, contentLength_2);
-                  oracledb.maxRows =maxRowsBak;
+                  oracledb.maxRows = maxRowsBak;
                   result.resultSet.close(function(err) {
                     should.not.exist(err);
                     cb();

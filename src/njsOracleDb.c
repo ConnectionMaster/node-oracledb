@@ -1,4 +1,4 @@
-// Copyright (c) 2015, 2020, Oracle and/or its affiliates. All rights reserved.
+// Copyright (c) 2015, 2021, Oracle and/or its affiliates. All rights reserved.
 
 //-----------------------------------------------------------------------------
 //
@@ -241,6 +241,7 @@ static njsConstant njsClassConstants[] = {
     { "POOL_STATUS_OPEN", NJS_POOL_STATUS_OPEN },
     { "POOL_STATUS_DRAINING", NJS_POOL_STATUS_DRAINING },
     { "POOL_STATUS_CLOSED", NJS_POOL_STATUS_CLOSED },
+    { "POOL_STATUS_RECONFIGURING", NJS_POOL_STATUS_RECONFIGURING },
 
     // AQ dequeue wait options
     { "AQ_DEQ_NO_WAIT", DPI_DEQ_WAIT_NO_WAIT },
@@ -470,6 +471,9 @@ static bool njsOracleDb_createPoolAsync(njsBaton *baton)
         return false;
     commonParams.edition = baton->edition;
     commonParams.editionLength = (uint32_t) baton->editionLength;
+    if (baton->sodaMetadataCache)
+        commonParams.sodaMetadataCache = 1;
+    commonParams.stmtCacheSize = baton->stmtCacheSize;
 
     // create pool
     if (dpiPool_create(baton->oracleDb->context, baton->user,
@@ -477,9 +481,6 @@ static bool njsOracleDb_createPoolAsync(njsBaton *baton)
             (uint32_t) baton->passwordLength, baton->connectString,
             (uint32_t) baton->connectStringLength, &commonParams,
             &params, &baton->dpiPoolHandle) < 0) {
-        return njsBaton_setErrorDPI(baton);
-    } else if (dpiPool_setStmtCacheSize(baton->dpiPoolHandle,
-            baton->stmtCacheSize) < 0) {
         return njsBaton_setErrorDPI(baton);
     }
 
@@ -505,7 +506,6 @@ static bool njsOracleDb_createPoolPostAsync(njsBaton *baton, napi_env env,
 static bool njsOracleDb_createPoolProcessArgs(njsBaton *baton, napi_env env,
         napi_value *args)
 {
-
     // initialize ODPI-C library, if necessary
     if (!njsOracleDb_initDPI(baton->oracleDb, env, NULL, baton))
         return false;
@@ -549,6 +549,9 @@ static bool njsOracleDb_createPoolProcessArgs(njsBaton *baton, napi_env env,
         return false;
     if (!njsBaton_getUnsignedIntFromArg(baton, env, args, 0, "queueTimeout",
             &baton->poolWaitTimeout, NULL))
+        return false;
+    if (!njsBaton_getBoolFromArg(baton, env, args, 0, "sodaMetaDataCache",
+            &baton->sodaMetadataCache, NULL))
         return false;
 
     return true;
@@ -657,15 +660,13 @@ static bool njsOracleDb_getConnectionAsync(njsBaton *baton)
 
     commonParams.edition = baton->edition;
     commonParams.editionLength = (uint32_t) baton->editionLength;
+    commonParams.stmtCacheSize = baton->stmtCacheSize;
 
     if (dpiConn_create(baton->oracleDb->context, baton->user,
             (uint32_t) baton->userLength, baton->password,
             (uint32_t) baton->passwordLength, baton->connectString,
             (uint32_t) baton->connectStringLength, &commonParams, &params,
             &baton->dpiConnHandle) < 0) {
-        return njsBaton_setErrorDPI(baton);
-    } else if (dpiConn_setStmtCacheSize(baton->dpiConnHandle,
-            baton->stmtCacheSize) < 0) {
         return njsBaton_setErrorDPI(baton);
     }
 
@@ -1595,7 +1596,8 @@ static napi_value njsOracleDb_setFetchAsString(napi_env env,
         napi_callback_info info)
 {
     const uint32_t validTypes[] = { NJS_DATATYPE_NUM, NJS_DATATYPE_DATE,
-            NJS_DATATYPE_BUFFER, NJS_DATATYPE_CLOB, NJS_DATATYPE_JSON, 0 };
+            NJS_DATATYPE_BUFFER, NJS_DATATYPE_CLOB, NJS_DATATYPE_NCLOB,
+            NJS_DATATYPE_JSON, 0 };
     njsOracleDb *oracleDb;
     napi_value value;
 

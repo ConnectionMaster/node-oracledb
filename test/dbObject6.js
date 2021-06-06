@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved. */
+/* Copyright (c) 2019, 2021, Oracle and/or its affiliates. All rights reserved. */
 
 /******************************************************************************
  *
@@ -35,9 +35,12 @@ describe('205. dbObject6.js', () => {
   const TABLE  = 'NODB_TAB_TESTGEOMETRY';
   let initialID = 0;
 
-  before(async () => {
+  before(async function() {
     try {
       conn = await oracledb.getConnection(dbconfig);
+      if (conn.oracleServerVersion < 1200000000) {
+        this.skip();
+      }
 
       let sql =
         `CREATE TABLE ${TABLE} (
@@ -47,18 +50,28 @@ describe('205. dbObject6.js', () => {
       let plsql = testsUtil.sqlCreateTable(TABLE, sql);
       await conn.execute(plsql);
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     }
   }); // before()
 
   after(async () => {
     try {
-      let sql = `DROP TABLE ${TABLE} PURGE`;
+      const sql = `BEGIN \n` +
+          `  DECLARE \n` +
+          `    e_table_missing EXCEPTION; \n` +
+          `    PRAGMA EXCEPTION_INIT(e_table_missing, -00942);\n` +
+          `    BEGIN \n` +
+          `      EXECUTE IMMEDIATE ('DROP TABLE ${TABLE} PURGE' ); \n` +
+          `    EXCEPTION \n` +
+          `      WHEN e_table_missing \n` +
+          `      THEN NULL; \n` +
+          `    END; \n` +
+          `END;  `;
       await conn.execute(sql);
 
       await conn.close();
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     }
   }); // after()
@@ -133,7 +146,7 @@ describe('205. dbObject6.js', () => {
       let result = await conn.execute(sql);
 
       for (let i = 0; i < result.rows.length; i++) {
-        should.strictEqual(result.rows[i][0], (i + 1) );
+        should.strictEqual(result.rows[i][0], (i + 1));
         should.strictEqual(result.rows[i][1].SDO_GTYPE, 2003);
         should.strictEqual(result.rows[i][1].SDO_SRID, null);
         should.strictEqual(result.rows[i][1].SDO_POINT, null);

@@ -45,7 +45,6 @@ describe('176. soda8.js', () => {
     }
 
     await sodaUtil.cleanup();
-    await sodaUtil.grantPrivilege();
   });
 
   it('176.1 replaceOne(), basic case with document content', async () => {
@@ -53,7 +52,7 @@ describe('176. soda8.js', () => {
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_176_1");
 
       let myKeys = [];
@@ -70,16 +69,16 @@ describe('176. soda8.js', () => {
       // Fetch all back
       let outDocuments = await collection.find().getDocuments();
       let contents = [];
-      for(let i = 0; i < outDocuments.length; i++) {
-        contents[i] = await outDocuments[i].getContent();
+      for (let i = 0; i < outDocuments.length; i++) {
+        contents[i] = outDocuments[i].getContent();
         if (i == 1) {
-          should.deepEqual( contents[i], inContent);
+          should.deepEqual(contents[i], inContent);
         } else {
           (contents[i]).should.be.oneOf(t_contents);
         }
       }
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -91,7 +90,7 @@ describe('176. soda8.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
@@ -103,7 +102,7 @@ describe('176. soda8.js', () => {
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_176_2");
 
       let myKeys = [];
@@ -114,7 +113,7 @@ describe('176. soda8.js', () => {
       }
 
       let inContent = { id: 2000, name: "Paul",  office: "Singapore" };
-      let inDocument = await soda.createDocument(inContent);
+      let inDocument = soda.createDocument(inContent);
 
       let res = await collection.find().key(myKeys[1]).replaceOne(inDocument);
       should.strictEqual(res.replaced, true);
@@ -122,16 +121,16 @@ describe('176. soda8.js', () => {
       // Fetch all back
       let documents = await collection.find().getDocuments();
       let contents = [];
-      for(let i = 0; i < documents.length; i++) {
-        contents[i] = await documents[i].getContent();
+      for (let i = 0; i < documents.length; i++) {
+        contents[i] = documents[i].getContent();
         if (i == 1) {
-          should.deepEqual( contents[i], inContent);
+          should.deepEqual(contents[i], inContent);
         } else {
           (contents[i]).should.be.oneOf(t_contents);
         }
       }
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -143,7 +142,7 @@ describe('176. soda8.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
@@ -155,7 +154,7 @@ describe('176. soda8.js', () => {
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_176_3");
 
       let myKeys = [];
@@ -175,12 +174,12 @@ describe('176. soda8.js', () => {
       // Fetch all back
       let outDocuments = await collection.find().getDocuments();
       let contents = [];
-      for(let i = 0; i < outDocuments.length; i++) {
-        contents[i] = await outDocuments[i].getContent();
+      for (let i = 0; i < outDocuments.length; i++) {
+        contents[i] = outDocuments[i].getContent();
         (contents[i]).should.be.oneOf(t_contents);
       }
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -192,7 +191,7 @@ describe('176. soda8.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
@@ -204,7 +203,7 @@ describe('176. soda8.js', () => {
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_176_4");
 
       let myKeys = [];
@@ -225,12 +224,12 @@ describe('176. soda8.js', () => {
       let outDocuments = await collection.find().keys([myKeys[0]]).getDocuments();
 
       let contents = [];
-      for(let i = 0; i < outDocuments.length; i++) {
-        contents[i] = await outDocuments[i].getContent();
+      for (let i = 0; i < outDocuments.length; i++) {
+        contents[i] = outDocuments[i].getContent();
         (contents[i]).should.be.oneOf(t_contents);
       }
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -242,7 +241,7 @@ describe('176. soda8.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
@@ -254,7 +253,7 @@ describe('176. soda8.js', () => {
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_176_5");
 
       let myKeys = [];
@@ -271,16 +270,16 @@ describe('176. soda8.js', () => {
       // Fetch all back
       let outDocuments = await collection.find().getDocuments();
       let contents = [];
-      for(let i = 0; i < outDocuments.length; i++) {
-        contents[i] = await outDocuments[i].getContent();
+      for (let i = 0; i < outDocuments.length; i++) {
+        contents[i] = outDocuments[i].getContent();
         if (i == 1) {
-          should.deepEqual( contents[i], inContent);
+          should.deepEqual(contents[i], inContent);
         } else {
           (contents[i]).should.be.oneOf(t_contents);
         }
       }
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -292,7 +291,7 @@ describe('176. soda8.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
@@ -304,7 +303,7 @@ describe('176. soda8.js', () => {
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_176_6");
 
       let myKeys = [];
@@ -315,7 +314,7 @@ describe('176. soda8.js', () => {
       }
 
       let inContent = { id: 2000, name: "Paul",  office: "Singapore" };
-      let inDocument = await soda.createDocument(inContent);
+      let inDocument = soda.createDocument(inContent);
 
       let updatedDocument = await collection.find().key(myKeys[1]).replaceOneAndGet(inDocument);
       should.exist(updatedDocument);
@@ -323,16 +322,16 @@ describe('176. soda8.js', () => {
       // Fetch all back
       let documents = await collection.find().getDocuments();
       let contents = [];
-      for(let i = 0; i < documents.length; i++) {
-        contents[i] = await documents[i].getContent();
+      for (let i = 0; i < documents.length; i++) {
+        contents[i] = documents[i].getContent();
         if (i == 1) {
-          should.deepEqual( contents[i], inContent);
+          should.deepEqual(contents[i], inContent);
         } else {
           (contents[i]).should.be.oneOf(t_contents);
         }
       }
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -344,7 +343,7 @@ describe('176. soda8.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
@@ -356,7 +355,7 @@ describe('176. soda8.js', () => {
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_176_7");
 
       let myKeys = [];
@@ -370,10 +369,10 @@ describe('176. soda8.js', () => {
       let updatedDocument = await collection.find().key(myKeys[1]).replaceOneAndGet(inContent);
       should.exist(updatedDocument);
 
-      let outContent = await updatedDocument.getContent();
+      let outContent = updatedDocument.getContent();
       should.not.exist(outContent);
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -385,7 +384,7 @@ describe('176. soda8.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
@@ -397,7 +396,7 @@ describe('176. soda8.js', () => {
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      let soda = await conn.getSodaDatabase();
+      let soda = conn.getSodaDatabase();
       collection = await soda.createCollection("soda_test_176_8");
 
       let myKeys = [];
@@ -414,7 +413,7 @@ describe('176. soda8.js', () => {
         .replaceOneAndGet(inContent);
       should.not.exist(updatedDocument);
 
-    } catch(err) {
+    } catch (err) {
       should.not.exist(err);
     } finally {
       await conn.commit();
@@ -426,7 +425,7 @@ describe('176. soda8.js', () => {
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }

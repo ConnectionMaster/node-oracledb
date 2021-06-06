@@ -1,4 +1,4 @@
-/* Copyright (c) 2017, 2018, Oracle and/or its affiliates. All rights reserved. */
+/* Copyright (c) 2017, 2021, Oracle and/or its affiliates. All rights reserved. */
 
 /******************************************************************************
  *
@@ -73,7 +73,7 @@ describe('19. fetchTimestampAsString.js', function() {
     });
   });
 
-  describe('19.1 TIMESTAMP',function() {
+  describe('19.1 TIMESTAMP', function() {
     var tableName = "nodb_timestamp1";
     var inData = assist.TIMESTAMP_STRINGS;
 
@@ -212,7 +212,7 @@ describe('19. fetchTimestampAsString.js', function() {
 
   }); // 19.2
 
-  describe('19.3 testing maxRows setttings and queryStream() to fetch as string', function() {
+  describe('19.3 testing maxRows settings and queryStream() to fetch as string', function() {
     var tableName = "nodb_timestamp3";
     var inData = assist.TIMESTAMP_TZ_STRINGS_1;
     var defaultLimit = oracledb.maxRows;
@@ -330,7 +330,7 @@ describe('19. fetchTimestampAsString.js', function() {
         function fetchRowFromRS(rs) {
           rs.getRow(function(err, row) {
             should.not.exist(err);
-            if(row) {
+            if (row) {
               should.deepEqual(row, want[count]);
               count++;
               return fetchRowFromRS(rs);
@@ -364,7 +364,7 @@ describe('19. fetchTimestampAsString.js', function() {
         function fetchRowFromRS(rs) {
           rs.getRow(function(err, row) {
             should.not.exist(err);
-            if(row) {
+            if (row) {
               should.deepEqual(row, want[count]);
               count++;
               return fetchRowFromRS(rs);
@@ -420,7 +420,7 @@ describe('19. fetchTimestampAsString.js', function() {
         function fetchRowFromRS(rs) {
           rs.getRow(function(err, row) {
             should.not.exist(err);
-            if(row) {
+            if (row) {
               should.deepEqual(row, want[count]);
               count++;
               return fetchRowFromRS(rs);
@@ -453,7 +453,7 @@ describe('19. fetchTimestampAsString.js', function() {
         function fetchRowFromRS(rs) {
           rs.getRow(function(err, row) {
             should.not.exist(err);
-            if(row) {
+            if (row) {
               should.deepEqual(row, want[count]);
               count++;
               return fetchRowFromRS(rs);
@@ -486,6 +486,10 @@ describe('19. fetchTimestampAsString.js', function() {
 
     stream.on('end', function() {
       should.deepEqual(result, want);
+      stream.destroy();
+    });
+
+    stream.on('close', function() {
       callback();
     });
   }

@@ -1,4 +1,4 @@
-/* Copyright (c) 2015, 2020, Oracle and/or its affiliates. All rights reserved. */
+/* Copyright (c) 2015, 2021, Oracle and/or its affiliates. All rights reserved. */
 
 /******************************************************************************
  *
@@ -34,6 +34,17 @@
 const oracledb = require('oracledb');
 const dbConfig = require('./dbconfig.js');
 
+// On Windows and macOS, you can specify the directory containing the Oracle
+// Client Libraries at runtime, or before Node.js starts.  On other platforms
+// the system library search path must always be set before Node.js is started.
+// See the node-oracledb installation documentation.
+// If the search path is not correct, you will get a DPI-1047 error.
+if (process.platform === 'win32') { // Windows
+  oracledb.initOracleClient({ libDir: 'C:\\oracle\\instantclient_19_11' });
+} else if (process.platform === 'darwin') { // macOS
+  oracledb.initOracleClient({ libDir: process.env.HOME + '/Downloads/instantclient_19_8' });
+}
+
 oracledb.extendedMetaData = true;
 
 async function run() {
@@ -52,7 +63,7 @@ async function run() {
 
     try {
       await connection.execute(`DROP TABLE no_purchaseorder_b`);
-    } catch(e) {
+    } catch (e) {
       if (e.errorNum != 942)
         console.error(e);
     }
@@ -66,7 +77,7 @@ async function run() {
     const inssql = `INSERT INTO no_purchaseorder_b (po_document) VALUES (:bv)`;
     const data = { "userId": 1, "userName": "Anna", "location": "Australia" };
 
-    if (oracledb.oracleClientVersion >= 2100000000 && connection.oracleServerVersion >= 2100000000 ) {
+    if (oracledb.oracleClientVersion >= 2100000000 && connection.oracleServerVersion >= 2100000000) {
       // Take advantage of direct binding of JavaScript objects
       await connection.execute(inssql, { bv: { val: data, type: oracledb.DB_TYPE_JSON } });
     } else {

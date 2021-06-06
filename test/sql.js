@@ -1,4 +1,4 @@
-/* Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved. */
+/* Copyright (c) 2017, 2021, Oracle and/or its affiliates. All rights reserved. */
 
 /******************************************************************************
  *
@@ -25,79 +25,81 @@
  *   generate sql
  *****************************************************************************/
 'use strict';
-var should   = require('should');
-var async    = require('async');
 
-var sql = exports;
+const should   = require('should');
+const async    = require('async');
+
+const sql = exports;
 module.exports = sql;
 
 sql.createTable = function(tableName, dataType) {
-  var element = dataType;
-  if(dataType === "CHAR") {
+  let element = dataType;
+
+  if (dataType === "CHAR") {
     element = element + "(1000)";
   }
-  if(dataType === "NCHAR") {
+  if (dataType === "NCHAR") {
     element = element + "(1000)";
   }
-  if(dataType === "VARCHAR2") {
+  if (dataType === "VARCHAR2") {
     element = element + "(1000)";
   }
-  if(dataType === "RAW") {
+  if (dataType === "RAW") {
     element = element + "(1000)";
   }
 
-  var sql = "BEGIN \n" +
-            "    DECLARE \n" +
-            "        e_table_missing EXCEPTION; \n" +
-            "        PRAGMA EXCEPTION_INIT(e_table_missing, -00942);\n" +
-            "    BEGIN \n" +
-            "        EXECUTE IMMEDIATE ('DROP TABLE " + tableName + " PURGE' ); \n" +
-            "    EXCEPTION \n" +
-            "        WHEN e_table_missing \n" +
-            "        THEN NULL; \n" +
-            "    END; \n" +
-            "    EXECUTE IMMEDIATE ( ' \n" +
-            "        CREATE TABLE " + tableName + " ( \n" +
-            "            id        NUMBER, \n" +
-            "            content   " + element + " \n" +
-            "        ) \n" +
-            "    '); \n" +
-            "END;  ";
+  const sql = `BEGIN
+                 DECLARE
+                      e_table_missing EXCEPTION;
+                      PRAGMA EXCEPTION_INIT(e_table_missing, -00942);
+                  BEGIN
+                      EXECUTE IMMEDIATE ('DROP TABLE ` + tableName + ` PURGE' );
+                  EXCEPTION
+                      WHEN e_table_missing
+                      THEN NULL;
+                  END;
+                  EXECUTE IMMEDIATE ( '
+                      CREATE TABLE ` + tableName + ` (
+                          id        NUMBER,
+                          content   ` + element + `
+                      )
+                  ');
+               END;`;
   return sql;
 };
 
 sql.createAllTable = function(tableName, dataTypeArray) {
-  var sql = "BEGIN \n" +
-            "    DECLARE \n" +
-            "        e_table_missing EXCEPTION; \n" +
-            "        PRAGMA EXCEPTION_INIT(e_table_missing, -00942);\n" +
-            "    BEGIN \n" +
-            "        EXECUTE IMMEDIATE ('DROP TABLE " + tableName + " PURGE' ); \n" +
-            "    EXCEPTION \n" +
-            "        WHEN e_table_missing \n" +
-            "        THEN NULL; \n" +
-            "    END; \n" +
-            "    EXECUTE IMMEDIATE ( ' \n" +
-            "        CREATE TABLE " + tableName + " ( \n" +
-            "            id    NUMBER, \n" ;
+  let sql = `BEGIN
+                 DECLARE
+                     e_table_missing EXCEPTION;
+                     PRAGMA EXCEPTION_INIT(e_table_missing, -00942);
+                 BEGIN
+                     EXECUTE IMMEDIATE ('DROP TABLE ` + tableName + ` PURGE' );
+                 EXCEPTION
+                     WHEN e_table_missing
+                     THEN NULL;
+                 END;
+                 EXECUTE IMMEDIATE ( '
+                     CREATE TABLE ` + tableName + ` (
+                         id    NUMBER, `;
 
-  async.forEach(dataTypeArray, function(element, cb) {
-    var index = dataTypeArray.indexOf(element);
-    var length = dataTypeArray.length;
-    var col_name = "col_" + ( index + 1 );
-    var col_type = element;
-    var isLast;
+  async.eachSeries(dataTypeArray, function(element, cb) {
+    const index = dataTypeArray.indexOf(element);
+    const length = dataTypeArray.length;
+    const col_name = "col_" + (index + 1);
+    let col_type = element;
+    let  isLast;
 
-    if(col_type === "CHAR") {
+    if (col_type === "CHAR") {
       element = element + "(2000)";
     }
-    if(col_type === "NCHAR") {
+    if (col_type === "NCHAR") {
       element = element + "(1000)";
     }
-    if(col_type === "VARCHAR2") {
+    if (col_type === "VARCHAR2") {
       element = element + "(4000)";
     }
-    if(col_type === "RAW") {
+    if (col_type === "RAW") {
       element = element + "(2000)";
     }
     isLast = (index == (length - 1)) ? true : false;
@@ -107,9 +109,9 @@ sql.createAllTable = function(tableName, dataTypeArray) {
     should.not.exist(err);
   });
   sql = sql +
-        "        ) \n" +
-        "    '); \n" +
-        "END;  ";
+        `        )
+            ');
+        END;`;
   return sql;
 };
 
@@ -119,8 +121,13 @@ sql.executeSql = function(connection, sql, bindVar, option, callback) {
     bindVar,
     option,
     function(err) {
+      if (err) {
+        let stack = new Error().stack;
+        console.error(err);
+        console.error(stack);
+      }
       should.not.exist(err);
-      callback();
+      callback(err);
     }
   );
 };
@@ -131,9 +138,14 @@ sql.executeInsert = function(connection, sql, bindVar, option, callback) {
     bindVar,
     option,
     function(err, result) {
+      if (err) {
+        let stack = new Error().stack;
+        console.error(err);
+        console.error(stack);
+      }
       should.not.exist(err);
       (result.rowsAffected).should.be.exactly(1);
-      callback();
+      callback(err);
     }
   );
 };
@@ -158,7 +170,7 @@ sql.createRowid = function(connection, rowid_type, object_number, relative_fno, 
 // relative_fno    The relative file number for the ROWID.
 // block_number    The block number for the ROWID.
 // row_number      The row number for the ROWID.
-  var myRowid = "";
+  let myRowid = "";
   connection.execute(
     "select DBMS_ROWID.ROWID_CREATE(" + rowid_type + ", " + object_number + ", " + relative_fno + ", " + block_number + ", " + row_number + ") create_rowid from dual",
     function(err, result) {
@@ -168,11 +180,12 @@ sql.createRowid = function(connection, rowid_type, object_number, relative_fno, 
     }
   );
 };
-var appendSql = function(sql, col_name, col_type, isLast) {
-  if(isLast === true) {
+
+const appendSql = function(sql, col_name, col_type, isLast) {
+  if (isLast === true) {
     sql = sql + "            " + col_name + " " + col_type + " \n";
   } else {
-    sql = sql + "            " +col_name + " " + col_type + ", \n";
+    sql = sql + "            " + col_name + " " + col_type + ", \n";
   }
   return sql;
 };

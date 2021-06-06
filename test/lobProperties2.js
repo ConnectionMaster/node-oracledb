@@ -1,4 +1,4 @@
-/* Copyright (c) 2016, 2018, Oracle and/or its affiliates. All rights reserved. */
+/* Copyright (c) 2016, 2021, Oracle and/or its affiliates. All rights reserved. */
 
 /******************************************************************************
  *
@@ -27,14 +27,14 @@
  *****************************************************************************/
 'use strict';
 
-var oracledb = require('oracledb');
-var should   = require('should');
-var async    = require('async');
-var dbConfig = require('./dbconfig.js');
+const oracledb = require('oracledb');
+const should   = require('should');
+const async    = require('async');
+const dbConfig = require('./dbconfig.js');
 
 describe("83. lobProperties2.js", function() {
 
-  var connection;
+  let connection;
 
   before(function(done) {
     oracledb.getConnection(dbConfig, function(err, conn) {
@@ -51,17 +51,17 @@ describe("83. lobProperties2.js", function() {
     });
   });
 
-  var checkChunkSize = function(type, callback) {
+  const checkChunkSize = function(type, callback) {
 
     connection.createLob(type, function(err, lob) {
       should.not.exist(err);
 
-      var t = lob.chunkSize;
+      const t = lob.chunkSize;
       t.should.be.a.Number();
 
       try {
         lob.chunkSize = t + 1;
-      } catch(err) {
+      } catch (err) {
         should.exist(err);
         // Cannot assign to read only property 'chunkSize' of object '#<Lob>'
       }
@@ -82,17 +82,17 @@ describe("83. lobProperties2.js", function() {
     checkChunkSize(oracledb.BLOB, done);
   });
 
-  var checkLength = function(type, callback) {
+  const checkLength = function(type, callback) {
 
     connection.createLob(type, function(err, lob) {
       should.not.exist(err);
 
-      var t = lob.length;
+      const t = lob.length;
       t.should.be.a.Number();
 
       try {
         lob.length = t + 1;
-      } catch(err) {
+      } catch (err) {
         should.exist(err);
         // Cannot set property length of #<Lob> which has only a getter
       }
@@ -112,17 +112,17 @@ describe("83. lobProperties2.js", function() {
     checkLength(oracledb.BLOB, done);
   });
 
-  var checkType = function(lobtype, callback) {
+  const checkType = function(lobtype, callback) {
 
     connection.createLob(lobtype, function(err, lob) {
       should.not.exist(err);
 
-      var t = lob.type;
+      const t = lob.type;
       t.should.eql(lobtype);
 
       try {
         lob.type = oracledb.BUFFER;
-      } catch(err) {
+      } catch (err) {
         should.exist(err);
         // Cannot set property type of #<Lob> which has only a getter
       }
@@ -144,11 +144,11 @@ describe("83. lobProperties2.js", function() {
 
   describe("83.7 pieceSize", function() {
 
-    var defaultChunkSize;
-    var clob, blob;
+    let defaultChunkSize;
+    let clob, blob;
 
     before("get the lobs", function(done) {
-      async.parallel([
+      async.series([
         function(cb) {
           connection.createLob(oracledb.CLOB, function(err, lob) {
             should.not.exist(err);
@@ -170,7 +170,7 @@ describe("83. lobProperties2.js", function() {
     }); // before
 
     after("close the lobs", function(done) {
-      async.parallel([
+      async.series([
         function(cb) {
           clob.close(cb);
         },
@@ -181,7 +181,7 @@ describe("83. lobProperties2.js", function() {
     }); // after
 
     it("83.7.1 default value is chunkSize", function(done) {
-      var t1 = clob.pieceSize,
+      const t1 = clob.pieceSize,
         t2 = blob.pieceSize;
 
       t1.should.eql(defaultChunkSize);
@@ -190,7 +190,7 @@ describe("83. lobProperties2.js", function() {
     });
 
     it("83.7.2 can be increased", function(done) {
-      var newValue = clob.pieceSize * 5;
+      const newValue = clob.pieceSize * 5;
 
       clob.pieceSize = clob.pieceSize * 5;
       blob.pieceSize = blob.pieceSize * 5;
@@ -208,7 +208,7 @@ describe("83. lobProperties2.js", function() {
       if (defaultChunkSize <= 500) {
         console.log('As default chunkSize is too small, this case is not applicable');
       } else {
-        var newValue = clob.pieceSize - 500;
+        const newValue = clob.pieceSize - 500;
 
         clob.pieceSize -= 500;
         blob.pieceSize -= 500;
@@ -239,7 +239,7 @@ describe("83. lobProperties2.js", function() {
     it("83.7.5 cannot be less than zero", function(done) {
       try {
         clob.pieceSize = -100;
-      } catch(err) {
+      } catch (err) {
         should.exist(err);
         (err.message).should.startWith('NJS-004:');
         // NJS-004: invalid value for property pieceSize
@@ -255,7 +255,7 @@ describe("83. lobProperties2.js", function() {
     it("83.7.6 cannot be null", function(done) {
       try {
         clob.pieceSize = null;
-      } catch(err) {
+      } catch (err) {
         should.exist(err);
         (err.message).should.startWith('NJS-004:');
         // NJS-004: invalid value for property pieceSize
@@ -271,7 +271,7 @@ describe("83. lobProperties2.js", function() {
     it("83.7.7 must be a number", function(done) {
       try {
         clob.pieceSize = NaN;
-      } catch(err) {
+      } catch (err) {
         should.exist(err);
         (err.message).should.startWith('NJS-004:');
         // NJS-004: invalid value for property pieceSize

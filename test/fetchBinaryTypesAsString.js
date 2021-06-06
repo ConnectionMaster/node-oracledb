@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved. */
+/* Copyright (c) 2019, 2021, Oracle and/or its affiliates. All rights reserved. */
 
 /******************************************************************************
  *
@@ -46,6 +46,7 @@ describe('190. fetchBinaryTypesAsString.js', function() {
   before(async function() {
     try {
       conn = await oracledb.getConnection(dbConfig);
+      if (conn.oracleServerVersion < 1200000000) this.skip();
     } catch (err) {
       should.not.exist(err);
     }
@@ -199,7 +200,7 @@ describe('190. fetchBinaryTypesAsString.js', function() {
         let res = await conn.execute(`select content from ${tableName}`);
         should.exist(res.rows);
         should.strictEqual(res.rows.length, 5);
-        for (let i=0; i<5; i++) {
+        for (let i = 0; i < 5; i++) {
           let fetchedString = res.rows[i][0];
           fetchedString.should.be.type("string");
           let contentPreciseDelta = Math.abs(parseFloat(fetchedString) - contents[i]);
@@ -331,7 +332,7 @@ describe('190. fetchBinaryTypesAsString.js', function() {
       try {
         oracledb.fetchAsString = [oracledb.NUMBER];
         let contents = [];
-        for (let i=0; i<5; i++) {
+        for (let i = 0; i < 5; i++) {
           contents.push(Math.random());
           await insertContent(contents[i]);
         }

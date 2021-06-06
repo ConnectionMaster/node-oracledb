@@ -53,14 +53,13 @@ describe('189. sodaOverwrite.js', function() {
     }
 
     await sodaUtil.cleanup();
-    await sodaUtil.grantPrivilege();
 
     try {
       conn = await oracledb.getConnection(dbConfig);
-      sodaDB = await conn.getSodaDatabase();
-      sodaDocument = await sodaDB.createDocument({name: "Chris", city: "Melbourne"});
+      sodaDB = conn.getSodaDatabase();
+      sodaDocument = sodaDB.createDocument({name: "Chris", city: "Melbourne"});
       sodaCollection = await sodaDB.createCollection("node_test_186_1");
-      sodaOperation = await sodaCollection.find();
+      sodaOperation = sodaCollection.find();
       sodaCursor = await sodaOperation.getCursor();
     } catch (err) {
       should.not.exist(err);
@@ -71,27 +70,27 @@ describe('189. sodaOverwrite.js', function() {
     if (sodaCursor) {
       try {
         await sodaCursor.close();
-      } catch(err) {
+      } catch (err) {
         should.not.exist(err);
       }
     }
     if (sodaCollection) {
       try {
         await sodaCollection.drop();
-      } catch(err) {
+      } catch (err) {
         should.not.exist(err);
       }
     }
     if (conn) {
       try {
         await conn.close();
-      } catch(err) {
+      } catch (err) {
         should.not.exist(err);
       }
     }
   });
 
-  it('189.1 Allows overwriting of public methods on SodaDatabase instance', async function() {
+  it('189.1 Allows overwriting of public methods on SodaDatabase instance', function() {
     try {
       let keys = Object.keys(sodaDB);
       for (let keysIdx = 0; keysIdx < keys.length; keysIdx += 1) {
@@ -106,7 +105,7 @@ describe('189. sodaOverwrite.js', function() {
     }
   });
 
-  it('189.2 Allows overwriting of public methods on SodaDocument instance', async function() {
+  it('189.2 Allows overwriting of public methods on SodaDocument instance', function() {
     try {
       let keys = Object.keys(sodaDocument);
       for (let keysIdx = 0; keysIdx < keys.length; keysIdx += 1) {
@@ -121,7 +120,7 @@ describe('189. sodaOverwrite.js', function() {
     }
   });
 
-  it('189.3 Allows overwriting of public methods on SodaCollection instance', async function() {
+  it('189.3 Allows overwriting of public methods on SodaCollection instance', function() {
     try {
       let keys = Object.keys(sodaCollection);
       for (let keysIdx = 0; keysIdx < keys.length; keysIdx += 1) {
@@ -136,7 +135,7 @@ describe('189. sodaOverwrite.js', function() {
     }
   });
 
-  it('189.4 Allows overwriting of public methods on SodaOperation instance', async function() {
+  it('189.4 Allows overwriting of public methods on SodaOperation instance', function() {
     try {
       let keys = Object.keys(sodaOperation);
       for (let keysIdx = 0; keysIdx < keys.length; keysIdx += 1) {
@@ -151,7 +150,7 @@ describe('189. sodaOverwrite.js', function() {
     }
   });
 
-  it('189.5 Allows overwriting of public methods on SodaDocCursor instance', async function() {
+  it('189.5 Allows overwriting of public methods on SodaDocCursor instance', function() {
     try {
       let keys = Object.keys(sodaCursor);
       for (let keysIdx = 0; keysIdx < keys.length; keysIdx += 1) {

@@ -167,11 +167,7 @@ static bool njsSodaDocCursor_getNextAsync(njsBaton *baton)
 {
     njsSodaDocCursor *cursor = (njsSodaDocCursor*) baton->callingInstance;
 
-    uint32_t flags = DPI_SODA_FLAGS_DEFAULT;
-
-    if (baton->oracleDb->autoCommit)
-        flags |= DPI_SODA_FLAGS_ATOMIC_COMMIT;
-    if (dpiSodaDocCursor_getNext(cursor->handle, flags,
+    if (dpiSodaDocCursor_getNext(cursor->handle, DPI_SODA_FLAGS_DEFAULT,
             &baton->dpiSodaDocHandle) < 0 )
         return njsBaton_setErrorDPI(baton);
     return true;
@@ -201,6 +197,7 @@ static bool njsSodaDocCursor_getNextPostAsync(njsBaton *baton, napi_env env,
 bool njsSodaDocCursor_newFromBaton(njsBaton *baton, napi_env env,
         napi_value *cursorObj)
 {
+    napi_value callingObj;
     njsSodaDocCursor *cursor;
 
     // create new instance
@@ -208,6 +205,13 @@ bool njsSodaDocCursor_newFromBaton(njsBaton *baton, napi_env env,
             baton->oracleDb->jsSodaDocCursorConstructor, cursorObj,
             (njsBaseInstance**) &cursor))
         return false;
+
+    // storing reference to operation which in turn stores reference to
+    // connection which is needed to serialize SodaDocCursor object methods
+    NJS_CHECK_NAPI(env, napi_get_reference_value(env, baton->jsCallingObjRef,
+            &callingObj))
+    NJS_CHECK_NAPI(env, napi_set_named_property(env, *cursorObj, "_operation",
+            callingObj))
 
     // perform initializations
     cursor->handle = baton->dpiSodaDocCursorHandle;

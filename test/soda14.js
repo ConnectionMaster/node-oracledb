@@ -61,11 +61,10 @@ describe('238. soda14.js', () => {
     }
 
     await sodaUtil.cleanup();
-    await sodaUtil.grantPrivilege();
 
     try {
       conn = await oracledb.getConnection(dbconfig);
-      soda = await conn.getSodaDatabase();
+      soda = conn.getSodaDatabase();
       coll = await soda.createCollection(collectionName);
 
       // populate the collection with a number of rows

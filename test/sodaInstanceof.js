@@ -50,7 +50,6 @@ describe('186. sodaInstanceof.js', function() {
     }
 
     await sodaUtil.cleanup();
-    await sodaUtil.grantPrivilege();
   });
 
   it('186.1 instanceof checks for SODA classes', async function() {
@@ -58,11 +57,11 @@ describe('186. sodaInstanceof.js', function() {
     try {
       conn = await oracledb.getConnection(dbConfig);
 
-      let sodaDB = await conn.getSodaDatabase();
+      let sodaDB = conn.getSodaDatabase();
       let isInstanceofCorrect = (sodaDB instanceof oracledb.SodaDatabase);
       isInstanceofCorrect.should.be.true();
 
-      let doc = await sodaDB.createDocument({name: "Chris", city: "Melbourne"});
+      let doc = sodaDB.createDocument({name: "Chris", city: "Melbourne"});
       isInstanceofCorrect = (doc instanceof oracledb.SodaDocument);
       isInstanceofCorrect.should.be.true();
 
@@ -70,7 +69,7 @@ describe('186. sodaInstanceof.js', function() {
       isInstanceofCorrect = (coll instanceof oracledb.SodaCollection);
       isInstanceofCorrect.should.be.true();
 
-      let operation = await coll.find();
+      let operation = coll.find();
       isInstanceofCorrect = (operation instanceof oracledb.SodaOperation);
       isInstanceofCorrect.should.be.true();
 
@@ -84,21 +83,21 @@ describe('186. sodaInstanceof.js', function() {
       if (cursor) {
         try {
           await cursor.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
       if (coll) {
         try {
           await coll.drop();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }
       if (conn) {
         try {
           await conn.close();
-        } catch(err) {
+        } catch (err) {
           should.not.exist(err);
         }
       }

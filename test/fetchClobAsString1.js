@@ -1,4 +1,4 @@
-/* Copyright (c) 2016, 2018, Oracle and/or its affiliates. All rights reserved. */
+/* Copyright (c) 2016, 2021, Oracle and/or its affiliates. All rights reserved. */
 
 /******************************************************************************
  *
@@ -96,7 +96,7 @@ describe('84. fetchClobAsString1.js', function() {
   });  // after
 
   var insertIntoClobTable1 = function(id, content, callback) {
-    if(content == "EMPTY_CLOB") {
+    if (content == "EMPTY_CLOB") {
       connection.execute(
         "INSERT INTO nodb_clob1 VALUES (:ID, EMPTY_CLOB())",
         [ id ],
@@ -126,7 +126,7 @@ describe('84. fetchClobAsString1.js', function() {
     connection.execute(
       "UPDATE nodb_clob1 set C = :C where ID = :ID",
       { ID: id, C: content },
-      function(err, result){
+      function(err, result) {
         should.not.exist(err);
         should.strictEqual(result.rowsAffected, 1);
         callback();
@@ -154,7 +154,7 @@ describe('84. fetchClobAsString1.js', function() {
     before('create Table and populate', function(done) {
       connection.execute(
         proc_create_table1,
-        function(err){
+        function(err) {
           should.not.exist(err);
           done() ;
         }
@@ -165,7 +165,7 @@ describe('84. fetchClobAsString1.js', function() {
       oracledb.fetchAsString = [];
       connection.execute(
         drop_table1,
-        function(err){
+        function(err) {
           should.not.exist(err);
           done();
         }
@@ -191,8 +191,8 @@ describe('84. fetchClobAsString1.js', function() {
           connection.execute(
             "SELECT ID, C from nodb_clob1 WHERE ID = :id",
             { id : id },
-            function(err, result){
-              if(specialStr === null) {
+            function(err, result) {
+              if (specialStr === null) {
                 should.not.exist(err);
                 should.equal(result.rows[0][1], null);
               } else {
@@ -271,7 +271,7 @@ describe('84. fetchClobAsString1.js', function() {
           connection.execute(
             "SELECT substr(C, 1, " + specialStrLen + ") from nodb_clob1 WHERE ID = :id",
             { id : id },
-            function(err, result){
+            function(err, result) {
               should.not.exist(err);
               var resultVal = result.rows[0][0];
               compareClientFetchResult(err, resultVal, specialStr, specialStr, specialStrLen);
@@ -308,8 +308,8 @@ describe('84. fetchClobAsString1.js', function() {
         },
         function(cb) {
           connection.execute(
-            "SELECT ID, C from nodb_clob1 where id = " + id_1 + " or id = " +id_2,
-            function(err, result){
+            "SELECT ID, C from nodb_clob1 where id = " + id_1 + " or id = " + id_2,
+            function(err, result) {
               should.not.exist(err);
               var resultVal = result.rows[0][1];
               compareClientFetchResult(err, resultVal, specialStr_1, content_1, contentLength_1);
@@ -341,8 +341,8 @@ describe('84. fetchClobAsString1.js', function() {
         },
         function(cb) {
           connection.execute(
-            "SELECT ID, C AS C1, C AS C2 from nodb_clob1 where id = " + id_1 + " or id = " +id_2,
-            function(err, result){
+            "SELECT ID, C AS C1, C AS C2 from nodb_clob1 where id = " + id_1 + " or id = " + id_2,
+            function(err, result) {
               should.not.exist(err);
               var resultVal = result.rows[0][1];
               compareClientFetchResult(err, resultVal, specialStr_1, content_1, contentLength_1);
@@ -379,7 +379,7 @@ describe('84. fetchClobAsString1.js', function() {
         function(cb) {
           connection.execute(
             "SELECT ID, C from nodb_clob1 where id = " + id,
-            function(err, result){
+            function(err, result) {
               should.not.exist(err);
               var resultVal = result.rows[0][1];
               compareClientFetchResult(err, resultVal, specialStr_2, content_2, contentLength_2);
@@ -409,7 +409,7 @@ describe('84. fetchClobAsString1.js', function() {
                          "END;";
           connection.execute(
             ref_proc,
-            function(err){
+            function(err) {
               should.not.exist(err);
               cb();
             }
@@ -437,7 +437,7 @@ describe('84. fetchClobAsString1.js', function() {
           var ref_proc_drop = "DROP PROCEDURE nodb_ref";
           connection.execute(
             ref_proc_drop,
-            function(err){
+            function(err) {
               should.not.exist(err);
               cb();
             }
@@ -462,7 +462,7 @@ describe('84. fetchClobAsString1.js', function() {
           connection.execute(
             "SELECT ID, C from nodb_clob1 WHERE ID = :id",
             { id : id },
-            function(err, result){
+            function(err, result) {
               should.not.exist(err);
               (result.rows.length).should.not.eql(0);
               var lob = result.rows[0][1];
@@ -483,6 +483,10 @@ describe('84. fetchClobAsString1.js', function() {
               lob.on('end', function() {
                 should.not.exist(err);
                 compareClientFetchResult(err, clobData, specialStr, content, contentLength);
+                lob.destroy();
+              });
+
+              lob.on('close', function() {
                 cb();
               });
             }
@@ -514,8 +518,8 @@ describe('84. fetchClobAsString1.js', function() {
         },
         function(cb) {
           connection.execute(
-            "SELECT ID, C from nodb_clob1 where id = " + id_1 + " or id = " +id_2,
-            function(err, result){
+            "SELECT ID, C from nodb_clob1 where id = " + id_1 + " or id = " + id_2,
+            function(err, result) {
               should.not.exist(err);
               result.rows.length.should.eql(1);
               var resultVal = result.rows[0][1];
@@ -549,8 +553,8 @@ describe('84. fetchClobAsString1.js', function() {
         },
         function(cb) {
           connection.execute(
-            "SELECT ID, C from nodb_clob1 where id = " + id_1 + " or id = " +id_2,
-            function(err, result){
+            "SELECT ID, C from nodb_clob1 where id = " + id_1 + " or id = " + id_2,
+            function(err, result) {
               should.not.exist(err);
               var resultVal = result.rows[0][1];
               compareClientFetchResult(err, resultVal, specialStr_1, content_1, contentLength_1);
@@ -602,6 +606,10 @@ describe('84. fetchClobAsString1.js', function() {
               lob.on('end', function() {
                 should.not.exist(err);
                 compareClientFetchResult(err, clobData, specialStr, content, contentLength);
+                lob.destroy();
+              });
+
+              lob.on('close', function() {
                 cb();
               });
             }
@@ -623,7 +631,7 @@ describe('84. fetchClobAsString1.js', function() {
         function(cb) {
           var sql = "SELECT ID, C from nodb_clob1 WHERE ID = " + id;
           var stream = connection.queryStream(sql);
-          stream.on('error', function (error) {
+          stream.on('error', function(error) {
             should.fail(error, null, 'Error event should not be triggered');
           });
 
@@ -636,8 +644,12 @@ describe('84. fetchClobAsString1.js', function() {
             counter++;
           });
 
-          stream.on('end', function () {
+          stream.on('end', function() {
             should.equal(counter, 1);
+            stream.destroy();
+          });
+
+          stream.on('close', function() {
             cb();
           });
         }
@@ -664,9 +676,9 @@ describe('84. fetchClobAsString1.js', function() {
           insertIntoClobTable1(id_2, content_2, cb);
         },
         function(cb) {
-          var sql = "SELECT ID, C from nodb_clob1 WHERE ID = " + id_1 + " or id = " +id_2;
+          var sql = "SELECT ID, C from nodb_clob1 WHERE ID = " + id_1 + " or id = " + id_2;
           var stream = connection.queryStream(sql);
-          stream.on('error', function (error) {
+          stream.on('error', function(error) {
             should.fail(error, null, 'Error event should not be triggered');
           });
 
@@ -676,16 +688,20 @@ describe('84. fetchClobAsString1.js', function() {
             var result = data[1];
             should.strictEqual(typeof result, "string");
             counter++;
-            if(counter == 1) {
+            if (counter == 1) {
               compareStrings(result, specialStr_1, content_1, contentLength_1);
             } else {
               compareStrings(result, specialStr_2, content_2, contentLength_2);
             }
           });
 
-          stream.on('end', function () {
+          stream.on('end', function() {
             should.equal(counter, 2);
             oracledb.maxRows = maxRowsBak;
+            stream.destroy();
+          });
+
+          stream.on('close', function() {
             cb();
           });
         }
@@ -712,9 +728,9 @@ describe('84. fetchClobAsString1.js', function() {
           insertIntoClobTable1(id_2, content_2, cb);
         },
         function(cb) {
-          var sql = "SELECT ID, C from nodb_clob1 WHERE ID = " + id_1 + " or id = " +id_2;
+          var sql = "SELECT ID, C from nodb_clob1 WHERE ID = " + id_1 + " or id = " + id_2;
           var stream = connection.queryStream(sql);
-          stream.on('error', function (error) {
+          stream.on('error', function(error) {
             should.fail(error, null, 'Error event should not be triggered');
           });
 
@@ -724,16 +740,20 @@ describe('84. fetchClobAsString1.js', function() {
             var result = data[1];
             should.strictEqual(typeof result, "string");
             counter++;
-            if(counter == 1) {
+            if (counter == 1) {
               compareStrings(result, specialStr_1, content_1, contentLength_1);
             } else {
               compareStrings(result, specialStr_2, content_2, contentLength_2);
             }
           });
 
-          stream.on('end', function () {
+          stream.on('end', function() {
             should.equal(counter, 2);
             oracledb.maxRows = maxRowsBak;
+            stream.destroy();
+          });
+
+          stream.on('close', function() {
             cb();
           });
         }
@@ -760,9 +780,9 @@ describe('84. fetchClobAsString1.js', function() {
           insertIntoClobTable1(id_2, content_2, cb);
         },
         function(cb) {
-          var sql = "SELECT ID, C from nodb_clob1 WHERE ID = " + id_1 + " or id = " +id_2;
+          var sql = "SELECT ID, C from nodb_clob1 WHERE ID = " + id_1 + " or id = " + id_2;
           var stream = connection.queryStream(sql);
-          stream.on('error', function (error) {
+          stream.on('error', function(error) {
             should.fail(error, null, 'Error event should not be triggered');
           });
 
@@ -772,16 +792,20 @@ describe('84. fetchClobAsString1.js', function() {
             var result = data[1];
             should.strictEqual(typeof result, "string");
             counter++;
-            if(counter == 1) {
+            if (counter == 1) {
               compareStrings(result, specialStr_1, content_1, contentLength_1);
             } else {
               compareStrings(result, specialStr_2, content_2, contentLength_2);
             }
           });
 
-          stream.on('end', function () {
+          stream.on('end', function() {
             should.equal(counter, 2);
             oracledb.maxRows = maxRowsBak;
+            stream.destroy();
+          });
+
+          stream.on('close', function() {
             cb();
           });
         }
@@ -834,7 +858,7 @@ describe('84. fetchClobAsString1.js', function() {
             { outFormat : oracledb.OUT_FORMAT_OBJECT },
             function(err, result) {
               var resultVal = result.rows[0].C;
-              if(specialStr === null) {
+              if (specialStr === null) {
                 should.not.exist(err);
                 should.equal(resultVal, null);
               } else {
@@ -1045,7 +1069,7 @@ describe('84. fetchClobAsString1.js', function() {
                          "END;";
           connection.execute(
             ref_proc,
-            function(err){
+            function(err) {
               should.not.exist(err);
               cb();
             }
@@ -1074,7 +1098,7 @@ describe('84. fetchClobAsString1.js', function() {
           var ref_proc_drop = "DROP PROCEDURE nodb_ref";
           connection.execute(
             ref_proc_drop,
-            function(err){
+            function(err) {
               should.not.exist(err);
               cb();
             }
@@ -1118,6 +1142,10 @@ describe('84. fetchClobAsString1.js', function() {
               lob.on('end', function() {
                 should.not.exist(err);
                 compareClientFetchResult(err, clobData, specialStr, content, contentLength);
+                lob.destroy();
+              });
+
+              lob.on('close', function() {
                 cb();
               });
             }
@@ -1149,7 +1177,7 @@ describe('84. fetchClobAsString1.js', function() {
         },
         function(cb) {
           connection.execute(
-            "SELECT ID, C from nodb_clob1 WHERE id = " + id_1 + " or id = " +id_2,
+            "SELECT ID, C from nodb_clob1 WHERE id = " + id_1 + " or id = " + id_2,
             { },
             { outFormat : oracledb.OUT_FORMAT_OBJECT },
             function(err, result) {
@@ -1186,7 +1214,7 @@ describe('84. fetchClobAsString1.js', function() {
         },
         function(cb) {
           connection.execute(
-            "SELECT ID, C from nodb_clob1 WHERE id = " + id_1 + " or id = " +id_2,
+            "SELECT ID, C from nodb_clob1 WHERE id = " + id_1 + " or id = " + id_2,
             { },
             { outFormat : oracledb.OUT_FORMAT_OBJECT },
             function(err, result) {
@@ -1242,6 +1270,10 @@ describe('84. fetchClobAsString1.js', function() {
               lob.on('end', function() {
                 should.not.exist(err);
                 compareClientFetchResult(err, clobData, specialStr, content, contentLength);
+                lob.destroy();
+              });
+
+              lob.on('close', function() {
                 cb();
               });
             }
@@ -1303,7 +1335,7 @@ describe('84. fetchClobAsString1.js', function() {
                 function(err, row) {
                   var resultVal;
                   resultVal = row.C;
-                  if(specialStr === null) {
+                  if (specialStr === null) {
                     should.equal(resultVal, null);
                   } else {
                     compareClientFetchResult(err, resultVal, specialStr, insertContent, insertContentLength);
@@ -1580,6 +1612,10 @@ describe('84. fetchClobAsString1.js', function() {
               lob.on('end', function() {
                 should.not.exist(err);
                 compareClientFetchResult(err, clobData, specialStr, content, contentLength);
+                lob.destroy();
+              });
+
+              lob.on('close', function() {
                 cb();
               });
             }
@@ -1610,7 +1646,7 @@ describe('84. fetchClobAsString1.js', function() {
         function(cb) {
           var rowNumFetched = 2;
           connection.execute(
-            "SELECT ID, C from nodb_clob1 WHERE id = " + id_1 + " or id = " +id_2,
+            "SELECT ID, C from nodb_clob1 WHERE id = " + id_1 + " or id = " + id_2,
             { },
             {
               outFormat : oracledb.OUT_FORMAT_OBJECT,
@@ -1627,7 +1663,7 @@ describe('84. fetchClobAsString1.js', function() {
                   compareClientFetchResult(err, resultVal, specialStr_1, content_1, contentLength_1);
                   resultVal = row[1].C;
                   compareClientFetchResult(err, resultVal, specialStr_2, content_2, contentLength_2);
-                  oracledb.maxRows =maxRowsBak;
+                  oracledb.maxRows = maxRowsBak;
                   result.resultSet.close(function(err) {
                     should.not.exist(err);
                     cb();
@@ -1662,7 +1698,7 @@ describe('84. fetchClobAsString1.js', function() {
         function(cb) {
           var rowNumFetched = 2;
           connection.execute(
-            "SELECT ID, C from nodb_clob1 WHERE id = " + id_1 + " or id = " +id_2,
+            "SELECT ID, C from nodb_clob1 WHERE id = " + id_1 + " or id = " + id_2,
             { },
             {
               outFormat : oracledb.OUT_FORMAT_OBJECT,
@@ -1679,7 +1715,7 @@ describe('84. fetchClobAsString1.js', function() {
                   compareClientFetchResult(err, resultVal, specialStr_1, content_1, contentLength_1);
                   resultVal = row[1].C;
                   compareClientFetchResult(err, resultVal, specialStr_2, content_2, contentLength_2);
-                  oracledb.maxRows =maxRowsBak;
+                  oracledb.maxRows = maxRowsBak;
                   result.resultSet.close(function(err) {
                     should.not.exist(err);
                     cb();
@@ -1730,6 +1766,10 @@ describe('84. fetchClobAsString1.js', function() {
               lob.on('end', function() {
                 should.not.exist(err);
                 compareClientFetchResult(err, clobData, specialStr, content, contentLength);
+                lob.destroy();
+              });
+
+              lob.on('close', function() {
                 cb();
               });
             }
@@ -1784,7 +1824,7 @@ describe('84. fetchClobAsString1.js', function() {
             { outFormat : oracledb.OUT_FORMAT_ARRAY },
             function(err, result) {
               var resultVal = result.rows[0][1];
-              if(specialStr === null) {
+              if (specialStr === null) {
                 should.not.exist(err);
                 should.equal(resultVal, null);
               } else {
@@ -1995,7 +2035,7 @@ describe('84. fetchClobAsString1.js', function() {
                          "END;";
           connection.execute(
             ref_proc,
-            function(err){
+            function(err) {
               should.not.exist(err);
               cb();
             }
@@ -2023,7 +2063,7 @@ describe('84. fetchClobAsString1.js', function() {
           var ref_proc_drop = "DROP PROCEDURE nodb_ref";
           connection.execute(
             ref_proc_drop,
-            function(err){
+            function(err) {
               should.not.exist(err);
               cb();
             }
@@ -2067,6 +2107,10 @@ describe('84. fetchClobAsString1.js', function() {
               lob.on('end', function() {
                 should.not.exist(err);
                 compareClientFetchResult(err, clobData, specialStr, content, contentLength);
+                lob.destroy();
+              });
+
+              lob.on('close', function() {
                 cb();
               });
             }
@@ -2098,7 +2142,7 @@ describe('84. fetchClobAsString1.js', function() {
         },
         function(cb) {
           connection.execute(
-            "SELECT ID, C from nodb_clob1 WHERE id = " + id_1 + " or id = " +id_2,
+            "SELECT ID, C from nodb_clob1 WHERE id = " + id_1 + " or id = " + id_2,
             { },
             { outFormat : oracledb.OUT_FORMAT_ARRAY },
             function(err, result) {
@@ -2135,7 +2179,7 @@ describe('84. fetchClobAsString1.js', function() {
         },
         function(cb) {
           connection.execute(
-            "SELECT ID, C from nodb_clob1 WHERE id = " + id_1 + " or id = " +id_2,
+            "SELECT ID, C from nodb_clob1 WHERE id = " + id_1 + " or id = " + id_2,
             { },
             { outFormat : oracledb.OUT_FORMAT_ARRAY },
             function(err, result) {
@@ -2191,8 +2235,13 @@ describe('84. fetchClobAsString1.js', function() {
               lob.on('end', function() {
                 should.not.exist(err);
                 compareClientFetchResult(err, clobData, specialStr, content, contentLength);
+                lob.destroy();
+              });
+
+              lob.on('close', function() {
                 cb();
               });
+
             }
           );
         }
@@ -2252,7 +2301,7 @@ describe('84. fetchClobAsString1.js', function() {
                 function(err, row) {
                   var resultVal;
                   resultVal = row[1];
-                  if(specialStr === null) {
+                  if (specialStr === null) {
                     should.equal(resultVal, null);
                   } else {
                     compareClientFetchResult(err, resultVal, specialStr, insertContent, insertContentLength);
@@ -2530,6 +2579,10 @@ describe('84. fetchClobAsString1.js', function() {
               lob.on('end', function() {
                 should.not.exist(err);
                 compareClientFetchResult(err, clobData, specialStr, content, contentLength);
+                lob.destroy();
+              });
+
+              lob.on('close', function() {
                 cb();
               });
             }
@@ -2560,7 +2613,7 @@ describe('84. fetchClobAsString1.js', function() {
         function(cb) {
           var rowNumFetched = 2;
           connection.execute(
-            "SELECT ID, C from nodb_clob1 WHERE id = " + id_1 + " or id = " +id_2,
+            "SELECT ID, C from nodb_clob1 WHERE id = " + id_1 + " or id = " + id_2,
             { },
             {
               outFormat : oracledb.OUT_FORMAT_ARRAY,
@@ -2577,7 +2630,7 @@ describe('84. fetchClobAsString1.js', function() {
                   compareClientFetchResult(err, resultVal, specialStr_1, content_1, contentLength_1);
                   resultVal = row[1][1];
                   compareClientFetchResult(err, resultVal, specialStr_2, content_2, contentLength_2);
-                  oracledb.maxRows =maxRowsBak;
+                  oracledb.maxRows = maxRowsBak;
                   result.resultSet.close(function(err) {
                     should.not.exist(err);
                     cb();
@@ -2612,7 +2665,7 @@ describe('84. fetchClobAsString1.js', function() {
         function(cb) {
           var rowNumFetched = 2;
           connection.execute(
-            "SELECT ID, C from nodb_clob1 WHERE id = " + id_1 + " or id = " +id_2,
+            "SELECT ID, C from nodb_clob1 WHERE id = " + id_1 + " or id = " + id_2,
             { },
             {
               outFormat : oracledb.OUT_FORMAT_ARRAY,
@@ -2629,7 +2682,7 @@ describe('84. fetchClobAsString1.js', function() {
                   compareClientFetchResult(err, resultVal, specialStr_1, content_1, contentLength_1);
                   resultVal = row[1][1];
                   compareClientFetchResult(err, resultVal, specialStr_2, content_2, contentLength_2);
-                  oracledb.maxRows =maxRowsBak;
+                  oracledb.maxRows = maxRowsBak;
                   result.resultSet.close(function(err) {
                     should.not.exist(err);
                     cb();
@@ -2680,6 +2733,10 @@ describe('84. fetchClobAsString1.js', function() {
               lob.on('end', function() {
                 should.not.exist(err);
                 compareClientFetchResult(err, clobData, specialStr, content, contentLength);
+                lob.destroy();
+              });
+
+              lob.on('close', function() {
                 cb();
               });
             }
